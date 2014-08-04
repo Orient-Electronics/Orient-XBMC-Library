@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<movie>
+    <title>Black Swan</title>
+    <originaltitle>Black Swan</originaltitle>
+    <sorttitle>Black Swan</sorttitle>
+    <rating>0.000000</rating>
+    <epbookmark>0.000000</epbookmark>
+    <year>2010</year>
+    <top250>195</top250>
+    <votes>371559</votes>
+    <outline>A ballet dancer wins the lead in Swan Lake and is perfect for the role of the delicate White Swan - Princess Odette - but slowly loses her mind as she becomes more and more like Odile, the Black Swan.</outline>
+    <plot>A psychological thriller set in the world of New York City Ballet, BLACK SWAN stars Natalie Portman as Nina, a featured dancer who finds herself locked in a web of competitive intrigue with a new rival at the company (Mila Kunis). The film takes a thrilling and at times terrifying journey through the psyche of a young ballerina whose starring role as the duplicitous swan queen turns out to be a part for which she becomes frighteningly perfect.</plot>
+    <tagline>In the era of personal branding, the scariest possibility is that someone might be better at being you than you are.</tagline>
+    <runtime>35</runtime>
+    <thumb>http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original/9aipydFnWTBSyFBxM46rVor7FZ.jpg</thumb>
+    <mpaa>Rated R for strong sexual content, disturbing violent images, language and some drug use</mpaa>
+    <playcount>0</playcount>
+    <lastplayed></lastplayed>
+    <id>tt0947798</id>
+    <genre>Drama</genre>
+    <genre>Mystery</genre>
+    <genre>Thriller</genre>
+    <country>US</country>
+    <set></set>
+    <credits>Mark Heyman</credits>
+    <credits>Andres Heinz</credits>
+    <credits>Natalie Portman</credits>
+    <credits>Mila Kunis</credits>
+    <credits>Vincent Cassel</credits>
+    <director>Darren Aronofsky</director>
+    <premiered></premiered>
+    <status></status>
+    <code></code>
+    <aired></aired>
+    <studio>Fox Searchlight Pictures</studio>
+    <trailer>plugin://plugin.video.youtube/?action=play_video&amp;videoid=5jaI1XOB-bs</trailer>
+    <fileinfo>
+        <streamdetails>
+            <video>
+                <codec>xvid</codec>
+                <aspect>2.406000</aspect>
+                <width>1280</width>
+                <height>532</height>
+                <durationinseconds>2100</durationinseconds>
+                <stereomode></stereomode>
+            </video>
+            <audio>
+                <codec>mp3</codec>
+                <language></language>
+                <channels>2</channels>
+            </audio>
+        </streamdetails>
+    </fileinfo>
+    <actor>
+        <name>Natalie Portman</name>
+        <role>Nina Sayers</role>
+        <order>0</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Mila Kunis</name>
+        <role>Lily</role>
+        <order>1</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Vincent Cassel</name>
+        <role>Thomas Leroy</role>
+        <order>2</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Barbara Hershey</name>
+        <role>Erica Sayers</role>
+        <order>3</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Winona Ryder</name>
+        <role>Beth Macintyre</role>
+        <order>4</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Benjamin Millepied</name>
+        <role>David</role>
+        <order>5</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Ksenia Solo</name>
+        <role>Veronica</role>
+        <order>6</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Kristina Anapau</name>
+        <role>Galina</role>
+        <order>7</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Janet Montgomery</name>
+        <role>Madeline</role>
+        <order>8</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Sebastian Stan</name>
+        <role>Andrew / Suitor</role>
+        <order>9</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Toby Hemingway</name>
+        <role>Tom / Suitor</role>
+        <order>10</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Sergio Torrado</name>
+        <role>Rothbart</role>
+        <order>11</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Mark Margolis</name>
+        <role>Mr. Fithian</role>
+        <order>12</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Tina Sloan</name>
+        <role>Mrs. Fithian</role>
+        <order>13</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Abraham Aronofsky</name>
+        <role>Mr. Stein / Patron (as Abe Aronofsky)</role>
+        <order>14</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Charlotte Aronofsky</name>
+        <role>Mrs. Stein / Patron</role>
+        <order>15</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Marcia Jean Kurtz</name>
+        <role>Costumer Georgina</role>
+        <order>16</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Shaun O&apos;Hagan</name>
+        <role>Stage Manager Sebastian</role>
+        <order>17</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Christopher Gartin</name>
+        <role>Sexy Waiter Scott</role>
+        <order>18</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Deborah Offner</name>
+        <role>Administrator Susie</role>
+        <order>19</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Stanley B. Herman</name>
+        <role>Uncle Hank</role>
+        <order>20</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Michelle Rodriguez Nouel</name>
+        <role>Physical Therapist</role>
+        <order>21</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Kurt Froman</name>
+        <role>Understudy For Siegfried</role>
+        <order>22</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Marty Krzywonos</name>
+        <role>Conductor</role>
+        <order>23</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Leslie Lyles</name>
+        <role>Nurse</role>
+        <order>24</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>John Epperson</name>
+        <role>Jaded Piano Player</role>
+        <order>25</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Arkadiy Figlin</name>
+        <role>Piano Player</role>
+        <order>26</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Tim Fain</name>
+        <role>Violin Player (as Timothy Fain)</role>
+        <order>27</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Sarah Lane</name>
+        <role>Lady In The Lane</role>
+        <order>28</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Liam Flaherty</name>
+        <role>Man In Stall</role>
+        <order>29</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Patrick Heusinger</name>
+        <role>Rich Gent</role>
+        <order>30</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Marina Stavitskaya</name>
+        <role>Ballet Mistress</role>
+        <order>31</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Olga Kostritzky</name>
+        <role>Ballet Mistress</role>
+        <order>32</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Christine Redpath</name>
+        <role>Ballet Mistress</role>
+        <order>33</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Alexandra Damiani</name>
+        <role>Ballet Mistress</role>
+        <order>34</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Rebecca Azenberg</name>
+        <role>Corps De Ballet</role>
+        <order>35</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Laura Bowman</name>
+        <role>Corps De Ballet</role>
+        <order>36</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Holly L. Fusco</name>
+        <role>Corps De Ballet</role>
+        <order>37</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Abigail Mentzer</name>
+        <role>Corps De Ballet</role>
+        <order>38</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Barette Vance</name>
+        <role>Corps De Ballet</role>
+        <order>39</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Lillian Di Piazza</name>
+        <role>Corps De Ballet (as Lillian Di Piazza)</role>
+        <order>40</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Megan Dickinson</name>
+        <role>Corps De Ballet</role>
+        <order>41</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Jessy Hendrickson</name>
+        <role>Corps De Ballet</role>
+        <order>42</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Geneviève Lebean</name>
+        <role>Corps De Ballet</role>
+        <order>43</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Rachel Jambois</name>
+        <role>Corps De Ballet</role>
+        <order>44</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Ryoko Sadoshima</name>
+        <role>Corps De Ballet</role>
+        <order>45</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Kaia A. Tack</name>
+        <role>Corps De Ballet</role>
+        <order>46</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Lauren Fadeley</name>
+        <role>Corps De Ballet</role>
+        <order>47</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Sarah Hay</name>
+        <role>Corps De Ballet</role>
+        <order>48</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Adrianna De Svastich</name>
+        <role>Corps De Ballet (as Adrianna De Svastich)</role>
+        <order>49</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Jamie Wolf</name>
+        <role>Corps De Ballet</role>
+        <order>50</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Carrie Lee Riggins</name>
+        <role>Corps De Ballet</role>
+        <order>51</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Gina Artese</name>
+        <role>Corps De Ballet</role>
+        <order>52</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Rhona Fox</name>
+        <role>Socialite (uncredited)</role>
+        <order>53</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Dj Jess</name>
+        <role>DJ (uncredited)</role>
+        <order>54</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Daralina Komar</name>
+        <role>Ballet Dancer (uncredited)</role>
+        <order>55</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Tim Lacatena</name>
+        <role>Ballet Dancer (uncredited)</role>
+        <order>56</order>
+        <thumb></thumb>
+    </actor>
+    <actor>
+        <name>Carmella Stolyar</name>
+        <role>Assistant Stage Manager (uncredited)</role>
+        <order>57</order>
+        <thumb></thumb>
+    </actor>
+    <resume>
+        <position>0.000000</position>
+        <total>0.000000</total>
+    </resume>
+    <dateadded>2014-07-12 19:57:26</dateadded>
+</movie>
+https://www.themoviedb.org/movie/44214-black-swan

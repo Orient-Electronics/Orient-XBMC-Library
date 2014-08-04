@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<movie xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<title>Shakespeare in Love</title>
+	<originaltitle>Shakespeare in Love</originaltitle>
+	<sorttitle>Shakespeare in Love</sorttitle>
+	<set></set>
+	<rating>7.2</rating>
+	<year>1998</year>
+	<top250></top250>
+	<votes>134335</votes>
+	<outline>A young Shakespeare, out of ideas and short of cash, meets his ideal woman and is inspired to write one of his most famous plays.</outline>
+	<plot>Young Shakespeare is forced to stage his latest comedy, Romeo and Ethel, the Pirate's Daughter, before it's even written. When a lovely noblewoman auditions for a role, they fall into forbidden love -- and his play finds a new life (and title). As their relationship progresses, Shakespeare's comedy soon transforms into tragedy.</plot>
+	<tagline>Love is the only inspiration.</tagline>
+	<certification>Argentina:13  / Australia:M  / Chile:14  / Denmark:7  / Finland:K-12/9  / France:U  / Germany:6 (f) (bw) / Hong Kong:IIB  / Hungary:14  / Ireland:15  / Italy:T  / Netherlands:AL  / New Zealand:M  / Peru:14  / Portugal:M/12  / Singapore:M18 (re-rating) / Singapore:R(A) (original rating) / South Korea:18  / Sweden:7  / Switzerland:12 (canton of Geneva) / Switzerland:12 (canton of Vaud) / UK:15  / Canada:14 (Nova Scotia) / Canada:14A (Alberta/British Columbia) / Canada:AA (Ontario) / Canada:G (Quebec) / Canada:PG (Manitoba) / Iceland:L  / Philippines:PG-13  / Brazil:14  / USA:R (certificate #36421)</certification>
+	<runtime>123</runtime>
+	<country>US</country>
+	<thumb>http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original/sAN5jedynbs3pa3ww0UXQ1k0lRF.jpg</thumb>
+	<mpaa>Rated R for sexuality</mpaa>
+	<playcount></playcount>
+	<watched></watched>
+	<id>tt0138097</id>
+	<id moviedb="imdb">tt0138097</id>
+	<id moviedb="tmdb">1934</id>
+	<id moviedb="themoviedb">1934</id>
+	<filenameandpath></filenameandpath>
+	<trailer>plugin://plugin.video.youtube/?action=play_video&amp;videoid=f2zUgwagLdk</trailer>
+	<genre>Comedy</genre>
+	<genre>Drama</genre>
+	<genre>Romance</genre>
+	<studio>Universal Pictures</studio>
+	<credits>Marc Norman / Tom Stoppard / Gwyneth Paltrow / Joseph Fiennes / Geoffrey Rush</credits>
+	<director>John Madden</director>
+	<actor>
+		<name>Geoffrey Rush</name>
+		<role>Philip Henslowe</role>
+	</actor>
+	<actor>
+		<name>Tom Wilkinson</name>
+		<role>Hugh Fennyman</role>
+	</actor>
+	<actor>
+		<name>Steven O'Donnell</name>
+		<role>Lambert</role>
+	</actor>
+	<actor>
+		<name>Tim McMullan</name>
+		<role>Frees (as Tim McMullen)</role>
+	</actor>
+	<actor>
+		<name>Joseph Fiennes</name>
+		<role>Will Shakespeare</role>
+	</actor>
+	<actor>
+		<name>Steven Beard</name>
+		<role>Makepeace - The Preacher</role>
+	</actor>
+	<actor>
+		<name>Antony Sher</name>
+		<role>Dr. Moth</role>
+	</actor>
+	<actor>
+		<name>Patrick Barlow</name>
+		<role>Will Kempe</role>
+	</actor>
+	<actor>
+		<name>Martin Clunes</name>
+		<role>Richard Burbage</role>
+	</actor>
+	<actor>
+		<name>Sandra Reinton</name>
+		<role>Rosaline</role>
+	</actor>
+	<actor>
+		<name>Simon Callow</name>
+		<role>Tilney - Master Of The Revels</role>
+	</actor>
+	<actor>
+		<name>Judi Dench</name>
+		<role>Queen Elizabeth</role>
+	</actor>
+	<actor>
+		<name>Bridget McConnell</name>
+		<role>Lady In Waiting (as Bridget McConnel)</role>
+	</actor>
+	<actor>
+		<name>Georgie Glen</name>
+		<role>Lady In Waiting</role>
+	</actor>
+	<actor>
+		<name>Nicholas Boulton</name>
+		<role>Henry Condell</role>
+	</actor>
+	<actor>
+		<name>Gwyneth Paltrow</name>
+		<role>Viola De Lesseps</role>
+	</actor>
+	<actor>
+		<name>Imelda Staunton</name>
+		<role>Nurse</role>
+	</actor>
+	<actor>
+		<name>Colin Firth</name>
+		<role>Lord Wessex</role>
+	</actor>
+	<actor>
+		<name>Desmond McNamara</name>
+		<role>Crier</role>
+	</actor>
+	<actor>
+		<name>Barnaby Kay</name>
+		<role>Nol</role>
+	</actor>
+	<actor>
+		<name>Jim Carter</name>
+		<role>Ralph Bashford</role>
+	</actor>
+	<actor>
+		<name>Paul Bigley</name>
+		<role>Peter - The Stage Manager</role>
+	</actor>
+	<actor>
+		<name>Jason Round</name>
+		<role>Actor In Tavern</role>
+	</actor>
+	<actor>
+		<name>Rupert Farley</name>
+		<role>Barman</role>
+	</actor>
+	<actor>
+		<name>Adam Barker</name>
+		<role>First Auditionee</role>
+	</actor>
+	<actor>
+		<name>Joe Roberts</name>
+		<role>John Webster</role>
+	</actor>
+	<actor>
+		<name>Harry Gostelow</name>
+		<role>Second Auditionee</role>
+	</actor>
+	<actor>
+		<name>Alan Cody</name>
+		<role>Third Auditionee</role>
+	</actor>
+	<actor>
+		<name>Mark Williams</name>
+		<role>Wabash</role>
+	</actor>
+	<actor>
+		<name>David Curtiz</name>
+		<role>John Hemmings</role>
+	</actor>
+	<actor>
+		<name>Gregor Truter</name>
+		<role>James Hemmings</role>
+	</actor>
+	<actor>
+		<name>Simon Day</name>
+		<role>First Boatman</role>
+	</actor>
+	<actor>
+		<name>Jill Baker</name>
+		<role>Lady De Lesseps</role>
+	</actor>
+	<actor>
+		<name>Amber Glossop</name>
+		<role>Scullery Maid</role>
+	</actor>
+	<actor>
+		<name>Robin Davies</name>
+		<role>Master Plum</role>
+	</actor>
+	<actor>
+		<name>Hywel Simons</name>
+		<role>Servant</role>
+	</actor>
+	<actor>
+		<name>Nicholas Le Prevost</name>
+		<role>Sir Robert De Lesseps</role>
+	</actor>
+	<actor>
+		<name>Ben Affleck</name>
+		<role>Ned Alleyn</role>
+	</actor>
+	<actor>
+		<name>Timothy Kightley</name>
+		<role>Edward Pope</role>
+	</actor>
+	<actor>
+		<name>Mark Saban</name>
+		<role>Augustine Philips</role>
+	</actor>
+	<actor>
+		<name>Bob Barrett</name>
+		<role>George Bryan</role>
+	</actor>
+	<actor>
+		<name>Roger Morlidge</name>
+		<role>James Armitage</role>
+	</actor>
+	<actor>
+		<name>Daniel Brocklebank</name>
+		<role>Sam Gosse</role>
+	</actor>
+	<actor>
+		<name>Roger Frost</name>
+		<role>Second Boatman</role>
+	</actor>
+	<actor>
+		<name>Rebecca Charles</name>
+		<role>Chambermaid</role>
+	</actor>
+	<actor>
+		<name>Richard Gold</name>
+		<role>Lord In Waiting</role>
+	</actor>
+	<actor>
+		<name>Rachel Clarke</name>
+		<role>First Whore</role>
+	</actor>
+	<actor>
+		<name>Lucy Speed</name>
+		<role>Second Whore</role>
+	</actor>
+	<actor>
+		<name>Patricia Potter</name>
+		<role>Third Whore</role>
+	</actor>
+	<actor>
+		<name>John Ramm</name>
+		<role>Makepeace's Neighbor</role>
+	</actor>
+	<actor>
+		<name>Martin Neely</name>
+		<role>Lady Montague</role>
+	</actor>
+	<actor>
+		<name>The Choir Of St. George's School In Windsor</name>
+		<role>Choir (as The Choir Of St. George's School Windsor)</role>
+	</actor>
+	<actor>
+		<name>Jason Canning</name>
+		<role>Nobleman (uncredited)</role>
+	</actor>
+	<actor>
+		<name>Kelley Costigan</name>
+		<role>Theatregoer (uncredited)</role>
+	</actor>
+	<actor>
+		<name>Rupert Everett</name>
+		<role>Christopher Marlowe</role>
+	</actor>
+	<actor>
+		<name>John Inman</name>
+		<role>Character Player (uncredited)</role>
+	</actor>
+	<fileinfo>
+		<streamdetails>
+			<audio>
+				<channels>2</channels>
+				<codec>Vorbis</codec>
+			</audio>
+			<video>
+				<aspect>1.963</aspect>
+				<codec>H.264</codec>
+				<durationinseconds>0</durationinseconds>
+				<height>432</height>
+				<language>en</language>
+				<scantype>Progressive</scantype>
+				<width>848</width>
+			</video>
+		</streamdetails>
+	</fileinfo>
+</movie>
+http://www.imdb.com/title/tt0138097/?ref_=fn_al_tt_1
