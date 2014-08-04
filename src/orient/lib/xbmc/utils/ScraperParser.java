@@ -310,7 +310,7 @@ public class ScraperParser {
 			if (iOptional > -1) // check that required param is there
 		      {
 				
-				String temp = "\\" + iOptional;
+//				String temp = "\\" + iOptional;
 
 		        // TODO
 		      }

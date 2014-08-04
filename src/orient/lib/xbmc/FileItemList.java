@@ -49,9 +49,11 @@ public class FileItemList {
 	
 	/**
 	 * stack files in a FileItemList
+	 * TODO implement this
 	 * 
 	 * @see Stack
 	 */
+	@SuppressWarnings("unused")
 	private void stackFiles() {
 		
 	}

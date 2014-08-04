@@ -109,7 +109,7 @@ public class URIUtils {
 			return "";
 		}
 		
-		String strParent = "";
+//		String strParent = "";
 		
 		String path = uri.getPath();
 		

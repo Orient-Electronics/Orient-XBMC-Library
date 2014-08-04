@@ -16,15 +16,15 @@ import orient.lib.xbmc.Settings;
 
 public class ScraperUrlGet {
 
-	private String CACHE_FILE_NAME = "response.txt";
-	private String CACHE_CONTEXT;
+//	private String CACHE_FILE_NAME = "response.txt";
+//	private String CACHE_CONTEXT;
 	private File cacheDir;
 	private UrlEntry scrURL;
 
 	public ScraperUrlGet(UrlEntry scrURL, String cacheContext) {
 		this.scrURL = scrURL;
-		CACHE_FILE_NAME = scrURL.m_cache;
-		CACHE_CONTEXT = cacheContext;
+//		CACHE_FILE_NAME = scrURL.m_cache;
+//		CACHE_CONTEXT = cacheContext;
 
 		Settings settings = Settings.getInstance();
 		cacheDir = settings.getCacheDir();

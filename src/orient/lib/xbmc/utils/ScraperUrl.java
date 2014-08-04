@@ -281,6 +281,7 @@ public class ScraperUrl {
 		return true;
 	}
 
+	@SuppressWarnings("deprecation")
 	public String GetThumbURL(UrlEntry entry) {
 		if (entry.m_spoof.length() == 0)
 			return entry.m_url;

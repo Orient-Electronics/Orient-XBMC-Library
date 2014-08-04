@@ -1,10 +1,9 @@
 package orient.lib.xbmc.addons.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import orient.lib.xbmc.Settings;
 import orient.lib.xbmc.addons.Addon;
 
 public class AddonTest {

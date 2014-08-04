@@ -1,7 +1,8 @@
 package orient.lib.xbmc.addons.test;
 
 import static junitparams.JUnitParamsRunner.$;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -13,14 +14,12 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 
 import orient.lib.xbmc.NfoFile;
 import orient.lib.xbmc.Settings;
 import orient.lib.xbmc.addons.Scraper;
 import orient.lib.xbmc.addons.ScraperError;
 import orient.lib.xbmc.utils.ScraperUrl;
-import orient.lib.xbmc.utils.XMLUtils;
 
 @RunWith(JUnitParamsRunner.class)
 public class ScraperTest {

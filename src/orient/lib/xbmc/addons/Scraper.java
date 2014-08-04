@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -341,10 +342,11 @@ public class Scraper extends Addon {
 					scurlMovie.ParseElement(pxeLink);
 
 
-				// calculate the relavance of this hit
-				String sCompareTitle = scurlMovie.strTitle.toLowerCase();
-				String sMatchTitle = sTitle.toLowerCase();
-
+				// calculate the relevance of this hit
+				String sCompareTitle = StringUtils.lowerCase(scurlMovie.strTitle);
+				String sMatchTitle = StringUtils.lowerCase(sTitle);
+				
+				
 				/*
 				 * Identify the best match by performing a fuzzy string compare on the search term and
 				 * the result. Additionally, use the year (if available) to further refine the best match.
@@ -356,7 +358,7 @@ public class Scraper extends Addon {
 				String sCompareYear = "";
 				double yearScore = 0;
 
-				if (pxnYear != null || pxnYear.getFirstChild() != null) {
+				if (pxnYear != null && pxnYear.getFirstChild() != null) {
 					sCompareYear = pxnYear.getFirstChild().getNodeValue();
 
 					if (sYear.length() != 0 && sCompareYear.length() != 0)

@@ -92,10 +92,9 @@ public class StackDirectory {
 		return stackedPath;
 	}
 
-	@SuppressWarnings("static-access")
 	public static String getStackedTitlePath(String stackPath) {
 
-		// Load up our Regualar Expressions
+		// Load up our Regular Expressions
 	    ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 	    
 	    Settings settings = Settings.getInstance();

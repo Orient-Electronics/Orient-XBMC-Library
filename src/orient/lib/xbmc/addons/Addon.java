@@ -62,6 +62,7 @@ public class Addon {
 		return addonDir.getPath() + "\\" + id + "\\addon.xml";
 	}
 
+	@SuppressWarnings("unused")
 	private boolean hasSettings;
 	private boolean requiressettings;
 	private boolean settingsLoaded;
