@@ -7,6 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import orient.lib.xbmc.utils.URIUtils;
 
 public class Util {
 
@@ -109,6 +112,71 @@ public class Util {
 		result.put("year", strYear);
 		result.put("titleAndYear", strTitleAndYear);
 		
+		return result;
+	}
+
+	public static String validatePath(String path) {
+		return validatePath(path, false);
+	}
+	
+	// TODO test
+	public static String validatePath(String path, boolean bFixDoubleSlashes) {
+		String result = path;
+
+		// Don't do any stuff on URLs containing %-characters or protocols that embed
+		// filenames. NOTE: Don't use IsInZip or IsInRar here since it will infinitely
+		// recurse and crash XBMC
+		if (URIUtils.isURL(path) && 
+				(path.indexOf('%') > -1 ||
+						StringUtils.startsWithIgnoreCase(path, "apk:") ||
+						StringUtils.startsWithIgnoreCase(path, "zip:") ||
+						StringUtils.startsWithIgnoreCase(path, "rar:") ||
+						StringUtils.startsWithIgnoreCase(path, "stack:") ||
+						StringUtils.startsWithIgnoreCase(path, "bluray:") ||
+						StringUtils.startsWithIgnoreCase(path, "multipath:") ))
+			return result;
+
+		// check the path for incorrect slashes
+		//		if (SystemUtils.IS_OS_WINDOWS) {
+		if (URIUtils.isDOSPath(path))
+		{
+			result = StringUtils.replace(result, "/", "\\");
+
+			/* The double slash correction should only be used when *absolutely*
+		       necessary! This applies to certain DLLs or use from Python DLLs/scripts
+		       that incorrectly generate double (back) slashes.
+			 */
+
+			if (bFixDoubleSlashes && !result.isEmpty())
+			{
+				// Fixup for double back slashes (but ignore the \\ of unc-paths)
+				for (int x = 1; x < result.length() - 1; x++)
+				{
+					if (result.charAt(x) == '\\' && result.charAt(x+1) == '\\')
+						result.substring(0, x-1);
+				}
+			}
+		}
+		else if (path.indexOf("://") > -1 || path.indexOf(":\\\\") > -1)
+
+		{
+			result = StringUtils.replace(result, "\\", "/");
+
+			/* The double slash correction should only be used when *absolutely*
+		       necessary! This applies to certain DLLs or use from Python DLLs/scripts
+		       that incorrectly generate double (back) slashes.
+			 */
+
+			if (bFixDoubleSlashes && !result.isEmpty())
+			{
+				// Fixup for double forward slashes(/) but don't touch the :// of URLs
+				for (int x = 1; x < result.length() - 1; x++)
+				{
+					if ( result.charAt(x) == '/' && result.charAt(x+1) == '/' && !(result.charAt(x-1) == ':' || (result.charAt(x-1) == '/' && result.charAt(x-2) == ':')) )
+						result.substring(0, x-1);
+				}
+			}
+		}
 		return result;
 	}
 	

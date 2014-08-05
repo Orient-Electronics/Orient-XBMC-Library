@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import orient.lib.xbmc.FileItem;
 import orient.lib.xbmc.FileItemList;
 import orient.lib.xbmc.Settings;
+import orient.lib.xbmc.URL;
 import orient.lib.xbmc.utils.URIUtils;
 
 
@@ -216,6 +217,27 @@ public class StackDirectory {
 	public static ArrayList<FileItem> getDirectory(String stackPath) {
 		return getFileItems(stackPath);
 	}
+	
+	
+	public static ArrayList<FileItem> getDirectory(URL url)
+	  { 
+		
+		// TODO implement
+		return getFileItems(url.Get());
+//	    ArrayList<String> files;
+//	    String pathToUrl = url.Get();
+//	    if (!getPaths(pathToUrl, files))
+//	      return false;   // error in path
+//
+//	    for (vector<std::string>::const_iterator i = files.begin(); i != files.end(); ++i)
+//	    {
+//	      CFileItem item(new CFileItem(*i));
+//	      item->SetPath(*i);
+//	      item->m_bIsFolder = false;
+//	      items.Add(item);
+//	    }
+//	    return true;
+	  }
 	
 	/**
 	 * Takes a Stack path, breaks it into individual file paths and 
