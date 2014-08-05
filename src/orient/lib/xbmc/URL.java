@@ -164,7 +164,7 @@ public class URL {
 				if (iProto != -1)
 				{
 					SetProtocolOptions(strURL.substring(iProto+1));
-					SetOptions(strURL.substring(iOptions,iProto-iOptions));
+					SetOptions(strURL.substring(iOptions,iProto));
 				}
 				else
 					SetOptions(strURL.substring(iOptions));
@@ -182,7 +182,7 @@ public class URL {
 			if (iAlphaSign != -1 && iAlphaSign < iEnd && (iAlphaSign < iSlash || iSlash == -1))
 			{
 				// username/password found
-				String strUserNamePassword = strURL.substring(iPos, iAlphaSign - iPos);
+				String strUserNamePassword = strURL.substring(iPos, iAlphaSign);
 
 				// first extract domain, if protocol is smb
 				if (m_strProtocol.equals("smb"))
@@ -220,7 +220,7 @@ public class URL {
 		// detect hostname:port/
 		if (iSlash == -1)
 		{
-			String strHostNameAndPort = strURL.substring(iPos, iEnd - iPos);
+			String strHostNameAndPort = strURL.substring(iPos, iEnd);
 			int iColon = strHostNameAndPort.indexOf(":");
 			if (iColon != -1)
 			{
@@ -235,7 +235,7 @@ public class URL {
 		}
 		else
 		{
-			String strHostNameAndPort = strURL.substring(iPos, iSlash - iPos);
+			String strHostNameAndPort = strURL.substring(iPos, iSlash); 
 			int iColon = strHostNameAndPort.indexOf(":");
 			if (iColon != -1)
 			{
@@ -249,7 +249,7 @@ public class URL {
 			iPos = iSlash + 1;
 			if (iEnd > iPos)
 			{
-				m_strFileName = strURL.substring(iPos, iEnd - iPos);
+				m_strFileName = strURL.substring(iPos, iEnd);
 
 				iSlash = m_strFileName.indexOf("/");
 				if(iSlash == -1)
@@ -366,7 +366,11 @@ public class URL {
 
 	public void setFileName(String strFileName) {
 		m_strFileName = strFileName;
+		m_strFileType = null;
 
+		if (strFileName == null)
+			return;
+		
 		int slash = m_strFileName.lastIndexOf("\\");
 		
 		if (slash == -1)
@@ -376,9 +380,10 @@ public class URL {
 		int period = m_strFileName.lastIndexOf('.');
 		if(period != -1 && (slash == -1 || period > slash))
 			m_strFileType = m_strFileName.substring(period+1);
-		else
-			m_strFileType = "";
 
+		if (m_strFileType == null)
+			return;
+				
 		m_strFileType = m_strFileType.trim();
 		m_strFileType = StringUtils.lowerCase(m_strFileType);
 
@@ -505,7 +510,9 @@ public class URL {
 		String strURL;
 
 		strURL = GetWithoutFilename();
-		strURL += m_strFileName;
+		
+		if (m_strFileName != null)
+			strURL += m_strFileName;
 
 		if( m_strOptions != null && !m_strOptions.isEmpty() )
 			strURL += m_strOptions;
@@ -596,7 +603,7 @@ public class URL {
 
 	String GetWithoutFilename() 
 	{
-		if (m_strProtocol == "")
+		if (m_strProtocol == null || m_strProtocol == "")
 			return "";
 
 		 
@@ -678,6 +685,9 @@ public class URL {
 	//modified to be more accomodating - if a non hex value follows a % take the characters directly and don't raise an error.
 	// However % characters should really be escaped like any other non safe character (www.rfc-editor.org/rfc/rfc1738.txt)
 	{
+		if (strURLData == null)
+			return null;
+		
 		String strResult = "";
 
 		/* result will always be less than source */
@@ -691,7 +701,7 @@ public class URL {
 				if (i < strURLData.length() - 2)
 				{
 					String strTmp;
-					strTmp = strURLData.substring(i + 1, 2);
+					strTmp = strURLData.substring(i + 1, (i + 1) + 2);
 					int dec_num=-1;
 					
 					// TODO Will have to do with regex
@@ -737,14 +747,14 @@ public class URL {
 
 	public String TranslateProtocol( String prot)
 	{
-		if (prot == "shout"
-				|| prot == "daap"
-				|| prot == "dav"
-				|| prot == "tuxbox"
-				|| prot == "rss")
+		if (prot.equals("shout") 
+				|| prot.equals("daap")
+				|| prot.equals("dav")
+				|| prot.equals("tuxbox")
+				|| prot.equals("rss"))
 			return "http";
 
-		if (prot == "davs")
+		if (prot.equals("davs"))
 			return "https";
 
 		return prot;
