@@ -524,81 +524,82 @@ public class URL {
 
 	String GetWithoutUserDetails(boolean redact) 
 	{
-		String strURL;
-
-		if (m_strProtocol.equals("stack"))
-		{
-			StackDirectory dir = new StackDirectory();
-			
-			ArrayList<FileItem> items = dir.getDirectory(this);
-			
-			ArrayList<String> newItems;
-			for (int i=0;i<items.size();++i)
-			{
-				URL url = new URL(items.get(0).getPath());
-				items.get(i).setPath(url.GetWithoutUserDetails(redact));
-				newItems.add(items.get(i).getPath());
-			}
-			dir.constructStackPath(newItems, strURL);
-			return strURL;
-		}
-
-		 int sizeneed = m_strProtocol.length()
-				+ m_strDomain.length()
-				+ m_strHostName.length()
-				+ m_strFileName.length()
-				+ m_strOptions.length()
-				+ m_strProtocolOptions.length()
-				+ 10;
-
-		if (redact)
-			sizeneed += StringUtils.length("USERNAME:PASSWORD@");
-
-
-		if (m_strProtocol == "")
-			return m_strFileName;
-
-		strURL = m_strProtocol;
-		strURL += "://";
-
-		if (redact && !m_strUserName.isEmpty())
-		{
-			strURL += "USERNAME";
-			if (!m_strPassword.isEmpty())
-			{
-				strURL += ":PASSWORD";
-			}
-			strURL += "@";
-		}
-
-		if (!m_strHostName.isEmpty())
-		{
-			String strHostName;
-
-			if (URIUtils.protocolHasParentInHostname(m_strProtocol))
-				strHostName = new URL(m_strHostName).GetWithoutUserDetails();
-			else
-				strHostName = m_strHostName;
-
-			if (URIUtils.protocolHasEncodedHostname(m_strProtocol))
-				strURL += Encode(strHostName);
-			else
-				strURL += strHostName;
-
-			if ( HasPort() )
-			{
-				strURL += "".format(":%i", m_iPort);
-			}
-			strURL += "/";
-		}
-		strURL += m_strFileName;
-
-		if( m_strOptions.length() > 0 )
-			strURL += m_strOptions;
-		if( m_strProtocolOptions.length() > 0 )
-			strURL += "|"+m_strProtocolOptions;
-
-		return strURL;
+		return null;
+//		String strURL;
+//
+//		if (m_strProtocol.equals("stack"))
+//		{
+//			StackDirectory dir = new StackDirectory();
+//			
+//			ArrayList<FileItem> items = dir.getDirectory(this);
+//			
+//			ArrayList<String> newItems;
+//			for (int i=0;i<items.size();++i)
+//			{
+//				URL url = new URL(items.get(0).getPath());
+//				items.get(i).setPath(url.GetWithoutUserDetails(redact));
+//				newItems.add(items.get(i).getPath());
+//			}
+//			dir.constructStackPath(newItems, strURL);
+//			return strURL;
+//		}
+//
+//		 int sizeneed = m_strProtocol.length()
+//				+ m_strDomain.length()
+//				+ m_strHostName.length()
+//				+ m_strFileName.length()
+//				+ m_strOptions.length()
+//				+ m_strProtocolOptions.length()
+//				+ 10;
+//
+//		if (redact)
+//			sizeneed += StringUtils.length("USERNAME:PASSWORD@");
+//
+//
+//		if (m_strProtocol == "")
+//			return m_strFileName;
+//
+//		strURL = m_strProtocol;
+//		strURL += "://";
+//
+//		if (redact && !m_strUserName.isEmpty())
+//		{
+//			strURL += "USERNAME";
+//			if (!m_strPassword.isEmpty())
+//			{
+//				strURL += ":PASSWORD";
+//			}
+//			strURL += "@";
+//		}
+//
+//		if (!m_strHostName.isEmpty())
+//		{
+//			String strHostName;
+//
+//			if (URIUtils.protocolHasParentInHostname(m_strProtocol))
+//				strHostName = new URL(m_strHostName).GetWithoutUserDetails();
+//			else
+//				strHostName = m_strHostName;
+//
+//			if (URIUtils.protocolHasEncodedHostname(m_strProtocol))
+//				strURL += Encode(strHostName);
+//			else
+//				strURL += strHostName;
+//
+//			if ( HasPort() )
+//			{
+//				strURL += "".format(":%i", m_iPort);
+//			}
+//			strURL += "/";
+//		}
+//		strURL += m_strFileName;
+//
+//		if( m_strOptions.length() > 0 )
+//			strURL += m_strOptions;
+//		if( m_strProtocolOptions.length() > 0 )
+//			strURL += "|"+m_strProtocolOptions;
+//
+//		return strURL;
 	}
 
 	String GetWithoutFilename() 
