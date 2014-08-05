@@ -1,8 +1,10 @@
 package orient.lib.xbmc.video;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -11,6 +13,7 @@ import orient.lib.xbmc.FileItem;
 import orient.lib.xbmc.NfoFile;
 import orient.lib.xbmc.NfoFile.NFOResult;
 import orient.lib.xbmc.addons.Scraper;
+import orient.lib.xbmc.addons.ScraperError;
 import orient.lib.xbmc.filesystem.StackDirectory;
 import orient.lib.xbmc.utils.ScraperUrl;
 import orient.lib.xbmc.utils.URIUtils;
@@ -18,6 +21,7 @@ import orient.lib.xbmc.utils.URIUtils;
 public class VideoInfoScanner {
 
 	private NfoFile nfoReader;
+	private FileItem lastProcessedFileItem;
 
 	/**
 	 * return values from the information lookup functions
@@ -300,7 +304,10 @@ public class VideoInfoScanner {
 	 * @return
 	 */
 	public INFO_RET retrieveInfoForMovie(FileItem item, boolean dirNames,
-			Scraper scraper, boolean useLocal, ScraperUrl scraperUrl) {
+			Scraper scraper, boolean useLocal) {
+
+		lastProcessedFileItem = item;
+		
 		if (item.isFolder() || !item.isVideo() || item.isNFO())
 			return INFO_RET.INFO_NOT_NEEDED;
 
@@ -314,33 +321,62 @@ public class VideoInfoScanner {
 		if (useLocal)
 			result = checkForNFOFile(item, dirNames, scraper);
 
-		// ////////////////////////////////
-		// / moved from CheckForNFOFile ///
-		// ////////////////////////////////
-
-		ScraperUrl scrUrl = new ScraperUrl();
-
+//		// ////////////////////////////////
+//		// / moved from CheckForNFOFile ///
+//		// ////////////////////////////////
+//
+//		ScraperUrl scrUrl = new ScraperUrl();
+//
+//		if (result == NFOResult.FULL_NFO) {
+//			if (scraper.content() == CONTENT_TYPE.CONTENT_TVSHOWS)
+//				scraper = nfoReader.getScraper();
+//		} else if (result != NFOResult.NO_NFO && result != NFOResult.ERROR_NFO) {
+//			scrUrl = nfoReader.getScraperUrl();
+//			scraper = nfoReader.getScraper();
+//
+//			// CLog::Log(LOGDEBUG,
+//			// "VideoInfoScanner: Fetching url '%s' using %s scraper (content: '%s')",
+//			// scrUrl.m_url[0].m_url.c_str(), info->Name().c_str(),
+//			// TranslateContent(info->Content()).c_str());
+//
+//			if (result == NFOResult.COMBINED_NFO)
+//				item.setFromVideoInfoTag(nfoReader.getDetails());
+//		}
+//
+//		// //////////////////////
+//
+//		if (result == NFOResult.FULL_NFO) {
+//			item.getVideoInfoTag().reset();
+//			item.setFromVideoInfoTag(nfoReader.getDetails());
+//
+//			// TODO DB
+//			// if (addVideo(item, scraper.content(), dirNames, true) < 0)
+//			// return INFO_RET.INFO_ERROR;
+//
+//			return INFO_RET.INFO_ADDED;
+//		}
+//
+//		// TODO this is useless, has to be returned
+//		if (result == NFOResult.URL_NFO || result == NFOResult.COMBINED_NFO)
+//			scraperUrl = scrUrl;
+//
+//		
+//		// Next part
+////		ScraperUrl url = new ScraperUrl();
+////	    int retVal = 0;
+////	    
+////	    if (scraperUrl != null)
+////	      url = scraperUrl;
+////	    
+	    
+		
+		// Compensation of above
+		if (result == NFOResult.COMBINED_NFO)
+			lastProcessedFileItem.setFromVideoInfoTag(nfoReader.getVideoInfoTag());
+	    
 		if (result == NFOResult.FULL_NFO) {
-			if (scraper.content() == CONTENT_TYPE.CONTENT_TVSHOWS)
-				scraper = nfoReader.getScraper();
-		} else if (result != NFOResult.NO_NFO && result != NFOResult.ERROR_NFO) {
-			scrUrl = nfoReader.getScraperUrl();
-			scraper = nfoReader.getScraper();
-
-			// CLog::Log(LOGDEBUG,
-			// "VideoInfoScanner: Fetching url '%s' using %s scraper (content: '%s')",
-			// scrUrl.m_url[0].m_url.c_str(), info->Name().c_str(),
-			// TranslateContent(info->Content()).c_str());
-
-			if (result == NFOResult.COMBINED_NFO)
-				item.setFromVideoInfoTag(nfoReader.getDetails());
-		}
-
-		// //////////////////////
-
-		if (result == NFOResult.FULL_NFO) {
-			item.getVideoInfoTag().reset();
-			item.setFromVideoInfoTag(nfoReader.getDetails());
+			lastProcessedFileItem.getVideoInfoTag().reset();
+			lastProcessedFileItem.setFromVideoInfoTag(nfoReader.getVideoInfoTag());
 
 			// TODO DB
 			// if (addVideo(item, scraper.content(), dirNames, true) < 0)
@@ -348,13 +384,113 @@ public class VideoInfoScanner {
 
 			return INFO_RET.INFO_ADDED;
 		}
+		
+		
+		// Data fetch
+		ScraperUrl videoUrl = findVideo(lastProcessedFileItem.getMovieName(dirNames), scraper);
 
-		// TODO this is useless, has to be returned
-		if (result == NFOResult.URL_NFO || result == NFOResult.COMBINED_NFO)
-			scraperUrl = scrUrl;
+		if (videoUrl == null)
+			return INFO_RET.INFO_NOT_FOUND;
+
+		NfoFile nfoFile = (result == NFOResult.COMBINED_NFO) ? nfoReader : null;
+
+		lastProcessedFileItem = getDetails(lastProcessedFileItem, videoUrl, scraper, nfoFile);
+
+		if (lastProcessedFileItem.getVideoInfoTag() != null) {
+			
+			// TODO DB
+			// if (AddVideo(pItem, info2->Content(), bDirNames, useLocal) < 0)
+			// return INFO_ERROR;
+			
+			return INFO_RET.INFO_ADDED;
+		}
 
 		// TODO: This is not strictly correct as we could fail to download
 		// information here or error, or be cancelled
 		return INFO_RET.INFO_NOT_FOUND;
+	}
+
+	
+	
+	public FileItem getLastProcessedFileItem() {
+		return lastProcessedFileItem;
+	}
+
+	public void setLastProcessedFileItem(FileItem lastProcessedFileItem) {
+		this.lastProcessedFileItem = lastProcessedFileItem;
+	}
+
+	/**
+	 * Loads the given file item with details of the given video. These details
+	 * are collected from both scraper and nfo file. Scraper data gets the
+	 * priority.
+	 * 
+	 * Logic different from XBMC: XBMC doesnt return anything if online scraper
+	 * fails. Our logic atleast sends the nfo data, if available.
+	 * 
+	 * TODO Recheck above logic, as nfo files may already be loaded at an earlier stage
+	 * TODO see if this can be renamed as "getVideoDetails"
+	 * 
+	 * @param item
+	 * @param url
+	 * @param scraper
+	 * @param nfoFile
+	 * @return
+	 */
+	public static FileItem getDetails(FileItem item, ScraperUrl url, Scraper scraper,
+			NfoFile nfoFile) {
+		
+		VideoInfoTag movieDetails = null;
+		
+		try {
+			movieDetails = scraper.getVideoDetails(url, true/*fMovie*/);
+		} catch (ScraperError e) {
+			e.printStackTrace();
+		}
+		
+		if (item.getVideoInfoTag() != null)
+			// TODO change this to merge
+			item.getVideoInfoTag().overwrite(movieDetails);
+		
+//		VideoInfoDownloader imdb = new VideoInfoDownloader(scraper);
+//		VideoInfoTag movieDetails = imdb.getDetails(url);
+		
+//		if (nfoFile != null)
+//			movieDetails = nfoFile.getDetails(movieDetails, true);
+		
+		item.setFromVideoInfoTag(movieDetails);
+
+		return item;
+	}
+
+	/**
+	 * Finds a movie by a given name from the given scraper.
+	 * 
+	 * TODO check if its only finding movies or working with other videos as
+	 * well.
+	 * 
+	 * @param videoName
+	 * @param scraper
+	 * @return
+	 */
+	public static ScraperUrl findVideo(String videoName, Scraper scraper) {
+
+		ArrayList<ScraperUrl> movieList;
+
+		try {
+			movieList = scraper.findMovie(videoName, true);
+
+			// no results. try without cleaning chars like '.' and '_'
+			if (movieList == null || movieList.isEmpty())
+				movieList = scraper.findMovie(videoName, false);
+
+			if (movieList != null && !movieList.isEmpty())
+				return movieList.get(0);
+
+		} catch (ScraperError e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 }

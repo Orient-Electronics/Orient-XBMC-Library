@@ -224,12 +224,12 @@ public class Scraper extends Addon {
 //		return vcali;
 	}
 
-	public ArrayList<ScraperUrl> FindMovie(String movie, boolean fFirst)
-			throws ScraperError, UnsupportedEncodingException {
+	public ArrayList<ScraperUrl> findMovie(String movie, boolean cleanChars)
+			throws ScraperError {
 
 		Util util = Util.getInstance();
 
-		Map<String, String> result = util.CleanString(movie, true, fFirst);
+		Map<String, String> result = util.CleanString(movie, true, cleanChars);
 
 		String sTitle = result.get("title");
 		String sYear = result.get("year");
@@ -240,14 +240,18 @@ public class Scraper extends Addon {
 		//		if (IsNoop())
 		//			return vcscurl;
 
-		if (!fFirst)
+		if (!cleanChars)
 			sTitle.replace('-',' ');
 
 		ArrayList<String> vcsIn = new ArrayList<String>();
 		//		  g_charsetConverter.utf8To(SearchStringEncoding(), sTitle, vcsIn[0]);
 
 
-		vcsIn.add(URLEncoder.encode(sTitle, "UTF-8").replace("+", "%20"));
+		try {
+			vcsIn.add(URLEncoder.encode(sTitle, "UTF-8").replace("+", "%20"));
+		} catch (UnsupportedEncodingException e) {
+			vcsIn.add(sTitle);
+		}
 
 		if (sYear != null && sYear.length() != 0)
 			vcsIn.add(sYear);
@@ -560,6 +564,9 @@ public class Scraper extends Addon {
 		vcsIn.add(scurl.m_url.get(0).m_url);
 		
 		ArrayList<String> vcsOut = run(sFunc, scurl, vcsIn);
+		
+		if (vcsOut.isEmpty())
+			return null;
 		
 		for (String i : vcsOut) {
 			Document doc = XMLUtils.getDocumentFromString(i);

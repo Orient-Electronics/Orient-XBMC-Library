@@ -13,6 +13,7 @@ import orient.lib.xbmc.FileItem;
 import orient.lib.xbmc.Settings;
 import orient.lib.xbmc.addons.Scraper;
 import orient.lib.xbmc.video.VideoInfoScanner;
+import orient.lib.xbmc.video.VideoInfoTag;
 
 @RunWith(JUnitParamsRunner.class)
 public class VideoInfoScannerTest {
@@ -27,8 +28,7 @@ public class VideoInfoScannerTest {
 	@SuppressWarnings("unused")
 	private Object[] nfoSearch() {
 		return $(
-				// Fix this test case with correct values
-				$( false, assetsPath + "Testing Data\\Movies - Flat\\movie.nfo", assetsPath + "Testing Data\\Movies - Flat\\Battleship (2012)cd1\\somefile.avi" ),
+				$( false, assetsPath + "Testing Data\\Movies - Folders\\Shakespeare in Love (1998)\\somefilename.nfo", assetsPath + "Testing Data\\Movies - Folders\\Shakespeare in Love (1998)cd1\\somefilename.avi" ),
 				
 				$( true, assetsPath + "Testing Data\\Movies - Flat\\movie.nfo", assetsPath + "Testing Data\\Movies - Flat\\Battleship (2012).avi" ),
 				$( true, assetsPath + "Testing Data\\Movies - Flat\\movie.nfo", assetsPath + "Testing Data\\Movies - Flat\\The Usual Suspects (1995).nfo" ),
@@ -52,15 +52,21 @@ public class VideoInfoScannerTest {
 	}
 
 	@Test
-	public void retrieveInfoForMovie(){
-		String filePath = assetsPath + "Testing Data\\Movies - Flat\\Black Swan (2010) [720p] [R] [voted 0.0] [Thriller]part1.avi";
+	public void retrieveInfoForMovie() {
+		
+		// TODO add more test cases
+		
+		String filePath = assetsPath + "Testing Data\\Movies - Flat\\Reservoir Dogs (1992).avi";
 		FileItem fileItem = new FileItem(filePath, false);
 		
 		Scraper scraper = new Scraper("metadata.themoviedb.org");
 		
 		VideoInfoScanner scanner = new VideoInfoScanner();
-		scanner.retrieveInfoForMovie(fileItem, true, scraper, true, null);
+		scanner.retrieveInfoForMovie(fileItem, false, scraper, true);
 		
-		fail();
+		fileItem = scanner.getLastProcessedFileItem();
+		VideoInfoTag infoTag = fileItem.getVideoInfoTag();
+		
+		assertEquals("Every dog has his day.", infoTag.tagline);
 	}
 }

@@ -1,12 +1,14 @@
 package orient.lib.xbmc;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.Date;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import orient.lib.xbmc.MediaSource.SourceType;
+import orient.lib.xbmc.filesystem.StackDirectory;
 import orient.lib.xbmc.utils.MimeTypes;
 import orient.lib.xbmc.utils.URIUtils;
 import orient.lib.xbmc.video.VideoInfoTag;
@@ -257,6 +259,8 @@ public class FileItem {
 		// setLabel(video.title);
 
 		// TODO what to do when video.fileNameAndPath and video.path are null?
+		if (video == null)
+			video = new VideoInfoTag();
 		
 		if (video.fileNameAndPath == null || video.fileNameAndPath.isEmpty()) {
 			
@@ -271,10 +275,6 @@ public class FileItem {
 
 		videoInfoTag = video;
 
-		if (videoInfoTag == null)
-			videoInfoTag = new VideoInfoTag();
-
-
 		// FillInDefaultIcon();
 		fillInMimeType();
 	}
@@ -285,6 +285,44 @@ public class FileItem {
 
 	public VideoInfoTag getVideoInfoTag() {
 		return videoInfoTag;
+	}
+
+	/**
+	 * TODO test
+	 * @param useFolderNames
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public String getMovieName(boolean useFolderNames) {
+		String strMovieName = getBaseMoviePath(useFolderNames);
+
+		if (URIUtils.isStack(strMovieName))
+			strMovieName = StackDirectory.getStackedTitlePath(strMovieName);
+
+		strMovieName = URIUtils.removeSlashAtEnd(strMovieName);
+
+		return URLDecoder.decode(URIUtils.getFileName(strMovieName));
+	}
+
+	private String getBaseMoviePath(boolean useFolderNames) {
+		String strMovieName = path;
+
+		// if (IsMultiPath())
+		// strMovieName = CMultiPathDirectory::GetFirstPath(m_strPath);
+
+		if (isOpticalMediaFile())
+			return getLocalMetadataPath();
+
+		if ((!isFolder || URIUtils.isInArchive(path)) && useFolderNames) {
+			strMovieName = URIUtils.getParentPath(strMovieName);
+
+			if (URIUtils.isInArchive(path)) {
+				String strArchivePath = URIUtils.getParentPath(strMovieName);
+				strMovieName = strArchivePath;
+			}
+		}
+
+		return strMovieName;
 	}
 
 }

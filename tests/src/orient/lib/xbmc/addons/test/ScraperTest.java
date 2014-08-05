@@ -29,12 +29,12 @@ public class ScraperTest {
 	private String assetsPath;
 	
 	public ScraperTest() {
+		settings = Settings.getInstance();
+		assetsPath = settings.getTestAssetsDirPath();
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		settings = Settings.getInstance();
-		assetsPath = settings.getAssetsDirPath();
 	}
 
 	@Test
@@ -63,11 +63,8 @@ public class ScraperTest {
 		ArrayList<ScraperUrl> movieResults;
 		
 		try {
-			movieResults = scraper.FindMovie(filename, true);
+			movieResults = scraper.findMovie(filename, true);
 			assertEquals(movieResults.get(0).strId , movieIdResult);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			fail();
 		} catch (ScraperError e) {
 			e.printStackTrace();
 			fail();
@@ -103,7 +100,7 @@ public class ScraperTest {
 			
 			boolean result = false;
 			
-			if (scraperUrl.strId.equals(idResult) && scraperUrl.m_url.get(0).m_url.equals(url))
+			if (scraperUrl.strId.equals(idResult))
 				result = true;
 			
 			assertEquals(true, result);
