@@ -386,6 +386,7 @@ public class ScraperParser {
 
 	}
 
+	// TODO replace with XMLUtil
 	public Element FirstChildScraperElement(Node node) {
 
 		// search for node
@@ -546,7 +547,7 @@ public class ScraperParser {
 		if (szDest != null)
 			iResult = Integer.parseInt(szDest);
 		
-
+		
 		Element pChildStart = FirstChildScraperElement(pChildElement);
 		ParseNext(pChildStart);
 

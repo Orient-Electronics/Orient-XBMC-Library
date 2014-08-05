@@ -21,17 +21,18 @@ public class NfoFile {
 	public enum NFOResult {
 		NO_NFO, FULL_NFO, URL_NFO, COMBINED_NFO, ERROR_NFO
 	}
-	private String document;
-	
-	private int headPos = 0;
 	/**
 	 * XBMC calls it "info"
 	 */
-	private Scraper scraper;
+	private int headPos = 0;
+
+	private String document;
+	
 	private ADDON_TYPE type;
-
-	private ScraperUrl scraperUrl;;
-
+	private Scraper scraper;
+	private ScraperUrl scraperUrl;
+	private VideoInfoTag videoInfoTag;
+	
 	public NfoFile() {
 		// TODO Auto-generated constructor stub
 	}
@@ -53,6 +54,8 @@ public class NfoFile {
 		// assume we can use these settings
 		this.scraper = info;
 		this.type = info.scraperTypeFromContent(info.content());
+		
+		VideoInfoTag details = null;
 
 		// load nfo file contents in object
 		if (!load(strPath))
@@ -75,7 +78,7 @@ public class NfoFile {
 				|| type == ADDON_TYPE.ADDON_SCRAPER_MUSICVIDEOS) {
 			
 			// first check if it's an XML file with the info we need
-			VideoInfoTag details = getDetails();
+			details = getDetails();
 
 			// TODO should we check null here?
 			
@@ -154,6 +157,9 @@ public class NfoFile {
 		}
 
 		// Result evaluation
+		this.videoInfoTag = details;
+		
+		
 		if (scrapeResult == 2)
 			return NFOResult.ERROR_NFO;
 
@@ -164,13 +170,48 @@ public class NfoFile {
 	}
 
 	/**
-	 * Loads the xml string 
+	 * Extract the ScraperUrl from NFO file using the given scraper.
 	 * 
-	 * TODO make this generic for other data tpes as well
+	 * @param scraper
+	 * @return 0 - success; 1 - no result; skip; 2 - error
+	 */
+	private int extractScraperUrl(Scraper scraper) {
+		if (scraper.isNoop()) {
+			scraperUrl = new ScraperUrl();
+			return 0;
+		}
+		if (scraper.getType() != type)
+			return 1;
+
+		// scraper.ClearCache();
+
+		try {
+			scraperUrl = scraper.nfoUrl(document);
+		} catch (ScraperError e) {
+			return 2;
+		}
+
+		if (!scraperUrl.m_url.isEmpty())
+			setScraper(scraper);
+
+		return scraperUrl.m_url.isEmpty() ? 1 : 0;
+	}
+
+	
+	
+	public VideoInfoTag getDetails() {
+		return getDetails(null, false);
+	}
+
+	/**
+	 * Loads NFO XML data to add build a VideoInfoTag. If a VideoInfoTag, it
+	 * is appended, otherwise a new tag is created.
 	 * 
+	 * @param details
+	 * @param prioritise
 	 * @return
 	 */
-	public VideoInfoTag getDetails()
+	public VideoInfoTag getDetails (VideoInfoTag details, boolean prioritise)
 	{
 		String strDoc = this.document.substring(headPos);
 
@@ -181,13 +222,15 @@ public class NfoFile {
 		strDoc = "<root>"+strDoc+"</root>";
 		
 		// Document processing
-		// TODO may be theres a better way to do this?
+		// TODO may be there's a better way to do this?
 		Document doc = XMLUtils.getDocumentFromString(strDoc);
 		Element rootEl = XMLUtils.getFirstChildElement(doc.getDocumentElement());
 		doc = XMLUtils.getDocumentFromString(XMLUtils.nodeToString(rootEl));
 
-		VideoInfoTag details = new VideoInfoTag();
-		details.load(doc.getDocumentElement(), true, false);
+		if (details == null)
+			details = new VideoInfoTag();
+		
+		details.load(doc.getDocumentElement(), true, prioritise);
 		
 		return details; 
 	}
@@ -196,8 +239,14 @@ public class NfoFile {
 		return scraper;
 	}
 
+	
+	
 	public ScraperUrl getScraperUrl() {
 		return scraperUrl;
+	}
+
+	public VideoInfoTag getVideoInfoTag() {
+		return videoInfoTag;
 	}
 
 	/**
@@ -240,39 +289,15 @@ public class NfoFile {
 		return extractScraperUrl(scraper);
 	}
 
-	/**
-	 * Extract the ScraperUrl from NFO file using the given scraper.
-	 * 
-	 * @param scraper
-	 * @return 0 - success; 1 - no result; skip; 2 - error
-	 */
-	private int extractScraperUrl(Scraper scraper) {
-		if (scraper.isNoop()) {
-			scraperUrl = new ScraperUrl();
-			return 0;
-		}
-		if (scraper.getType() != type)
-			return 1;
-
-		// scraper.ClearCache();
-
-		try {
-			scraperUrl = scraper.nfoUrl(document);
-		} catch (ScraperError e) {
-			return 2;
-		}
-
-		if (!scraperUrl.m_url.isEmpty())
-			setScraper(scraper);
-
-		return scraperUrl.m_url.isEmpty() ? 1 : 0;
-	}
-
 	public void setScraper(Scraper scraper) {
 		this.scraper = scraper;
 	}
 
 	public void setScraperUrl(ScraperUrl scraperUrl) {
 		this.scraperUrl = scraperUrl;
+	}
+
+	public void setVideoInfoTag(VideoInfoTag videoInfoTag) {
+		this.videoInfoTag = videoInfoTag;
 	}
 }
