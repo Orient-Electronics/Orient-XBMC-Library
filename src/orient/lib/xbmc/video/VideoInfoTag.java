@@ -8,8 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.w3c.dom.Element;
 
@@ -132,6 +134,7 @@ public class VideoInfoTag {
 		xmlTagMapping.put("track", "track");
 		xmlTagMapping.put("displayseason", "specialSortSeason");
 		xmlTagMapping.put("displayepisode", "specialSortEpisode");
+		xmlTagMapping.put("specialAfterSeason", "specialAfterSeason");
 		xmlTagMapping.put("playcount", "playCount");
 		xmlTagMapping.put("runtime", "duration");
 		
@@ -239,6 +242,65 @@ public class VideoInfoTag {
 		dateAdded = null;
 
 	}
+	
+	
+	public void merge (VideoInfoTag that) {
+		// TODO implement this
+	}
+	
+	/**
+	 * Overwrites the current info tag with the given Info Tag
+	 * @param that
+	 */
+	public void overwrite(VideoInfoTag that) {
+
+		Iterator<Entry<String, String>> it = xmlTagMapping.entrySet().iterator();
+		
+	    while (it.hasNext()) {
+	    	
+			Map.Entry<String, String> pair = (Entry<String, String>)it.next();
+	        
+	        String fieldName = (String) pair.getValue();
+	        String fieldType;
+	        
+	        try {
+				fieldType = getFieldType(fieldName);
+
+				Field thisField = this.getClass().getDeclaredField(fieldName);
+				Field thatField = that.getClass().getDeclaredField(fieldName);
+				
+				switch (fieldType) {
+				
+				case "int":
+					
+//					if (thatField.getInt(this) > 0)
+						thisField.set(this, thatField.getInt(that));
+					
+					break;
+				case "float":
+					
+//					if (thatField.getFloat(this) > 0)
+						thisField.set(this, thatField.getFloat(that));
+					
+					break;
+				case "String":
+				case "Date":
+				case "ArrayList":
+				default:
+					
+//					if (thatField.get(that) != null)
+						thisField.set(this, thatField.get(that));
+					
+					break;
+				}
+			} catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+				e.printStackTrace();
+				continue;
+			}
+	        
+	        it.remove(); // avoids a ConcurrentModificationException
+	    }
+	}
 
 	/**
 	 * Load information to a videoinfotag from an XML element There are three
@@ -330,8 +392,11 @@ public class VideoInfoTag {
 				else if (fieldType.equals("Date")) 
 				{
 					String dateStr = XMLUtils.getFirstChildValue(child);
-					Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(dateStr);
-					setField(memberName, date);
+					
+					if (dateStr != null) {
+						Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(dateStr);
+						setField(memberName, date);
+					}
 				} 
 				else if (fieldType.equals("ArrayList")) 
 				{
@@ -541,13 +606,19 @@ public class VideoInfoTag {
 			Element position = XMLUtils.getFirstChildElement(el, "position");
 
 			if (position != null){
-				resumePoint.timeInSeconds = Double.parseDouble(XMLUtils.getFirstChildValue(el));
+				String value = XMLUtils.getFirstChildValue(position);
+				
+				if (value != null && !value.trim().isEmpty())
+					resumePoint.timeInSeconds = Double.parseDouble(value.trim());
 			}
 			
 			Element total = XMLUtils.getFirstChildElement(el, "total");
 			
 			if (total != null){
-				resumePoint.totalTimeInSeconds = Double.parseDouble(XMLUtils.getFirstChildValue(el));
+				String value = XMLUtils.getFirstChildValue(total);
+				
+				if (value != null && !value.trim().isEmpty())
+					resumePoint.totalTimeInSeconds = Double.parseDouble(value);
 			}
 		}
 		
