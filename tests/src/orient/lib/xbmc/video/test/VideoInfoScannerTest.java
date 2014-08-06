@@ -28,8 +28,7 @@ public class VideoInfoScannerTest {
 	@SuppressWarnings("unused")
 	private Object[] nfoSearch() {
 		return $(
-				$( false, assetsPath + "Testing Data\\Movies - Folders\\Shakespeare in Love (1998)\\somefilename.nfo", assetsPath + "Testing Data\\Movies - Folders\\Shakespeare in Love (1998)cd1\\somefilename.avi" ),
-				
+				$( false, assetsPath + "Testing Data\\Movies - Folders\\Shakespeare in Love (1998)\\somefilename.nfo", assetsPath + "Testing Data\\Movies - Folders\\Shakespeare in Love (1998)cd1\\somefilename.avi" ),			
 				$( true, assetsPath + "Testing Data\\Movies - Flat\\movie.nfo", assetsPath + "Testing Data\\Movies - Flat\\Battleship (2012).avi" ),
 				$( true, assetsPath + "Testing Data\\Movies - Flat\\movie.nfo", assetsPath + "Testing Data\\Movies - Flat\\The Usual Suspects (1995).nfo" ),
 				$( false, assetsPath + "Testing Data\\Movies - Flat\\The Usual Suspects (1995).nfo", assetsPath + "Testing Data\\Movies - Flat\\The Usual Suspects (1995).nfo" ),
@@ -68,5 +67,24 @@ public class VideoInfoScannerTest {
 		VideoInfoTag infoTag = fileItem.getVideoInfoTag();
 		
 		assertEquals("Every dog has his day.", infoTag.tagline);
+	}
+	
+	@Test
+	public void retrieveInfoForMusicVideo() {
+		
+		// TODO add more test cases
+		
+		String filePath = assetsPath + "Testing Data\\Music Videos - Flat\\Michael Jackson - Beat It.avi";
+		FileItem fileItem = new FileItem(filePath, false);
+		
+		Scraper scraper = new Scraper("metadata.musicvideos.theaudiodb.com");
+		
+		VideoInfoScanner scanner = new VideoInfoScanner();
+		scanner.retrieveInfoForMusicVideo(fileItem, false, scraper, true);
+		
+		fileItem = scanner.getLastProcessedFileItem();
+		VideoInfoTag infoTag = fileItem.getVideoInfoTag();
+		
+		assertEquals("Thriller", infoTag.album);
 	}
 }

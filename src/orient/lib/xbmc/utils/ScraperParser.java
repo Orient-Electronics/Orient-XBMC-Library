@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -200,7 +201,7 @@ public class ScraperParser {
 
 		if (pExpression == null)
 			return dest;
-
+		
 		// Case Sensitive
 		boolean bInsensitive = true;
 		String sensitive = XMLUtils.getAttribute(element, "cs");
@@ -558,6 +559,8 @@ public class ScraperParser {
 		if (szClearBuffers == null || szClearBuffers == "no")
 			ClearBuffers();
 
+		
+		
 		return temp;
 	}
 
@@ -637,6 +640,7 @@ public class ScraperParser {
 				strBuffer = strDirty.substring(index1 + token.length(), index2);
 
 				// trim
+				StringEscapeUtils.unescapeXml(strBuffer);
 				strBuffer = strBuffer.trim();
 
 				strDirty = before + strBuffer + after;
@@ -659,12 +663,14 @@ public class ScraperParser {
 
 				strBuffer = strDirty.substring(index1 + token.length(), index2);
 
-				// trim
-				try {
-					strBuffer = URLEncoder.encode(strBuffer, "UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
+				// encode
+				strBuffer = orient.lib.xbmc.URL.Encode(strBuffer);
+				
+//				try {
+//					strBuffer = URLEncoder.encode(strBuffer, "UTF-8");
+//				} catch (UnsupportedEncodingException e) {
+//					e.printStackTrace();
+//				}
 
 				strDirty = before + strBuffer + after;
 			} else

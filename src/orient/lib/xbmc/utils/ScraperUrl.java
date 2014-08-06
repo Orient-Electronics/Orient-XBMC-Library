@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -84,6 +85,8 @@ public class ScraperUrl {
 
 			if (url.m_url == null || url.m_url.length() == 0)
 				url.m_url = child.getNodeName();
+			
+			url.m_url = StringEscapeUtils.unescapeXml(url.m_url);
 		}
 		
 

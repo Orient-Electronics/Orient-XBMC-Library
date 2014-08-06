@@ -60,7 +60,8 @@ public class ScraperUrlGet {
 	        else
 	        	conn.setRequestMethod("GET");
 	        
-	        conn.addRequestProperty("Referer", scrURL.m_spoof);
+	        if (scrURL.m_spoof != null)
+	        	conn.addRequestProperty("Referer", scrURL.m_spoof);
 	        
 	        if (scrURL.m_isgz)
 	        	conn.addRequestProperty("Accept-Encoding", "gzip");

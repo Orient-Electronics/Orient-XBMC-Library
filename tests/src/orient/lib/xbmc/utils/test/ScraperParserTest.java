@@ -43,7 +43,7 @@ public class ScraperParserTest {
 		"this !!!CLEAN!!!is!!!CLEAN!!! a string !!!CLEAN!!!<i>with</i>!!!CLEAN!!! a tag, this is a string with a tag", 
 		"!!!TRIM!!!   foo bar  !!!TRIM!!!, foo bar",
 		"!!!FIXCHARS!!!   ?   !!!FIXCHARS!!!, ?",
-		"!!!ENCODE!!!http://example.com/räksmörgås!!!ENCODE!!!, http%3A%2F%2Fexample.com%2Fr%E4ksm%F6rg%E5s",
+		"!!!ENCODE!!!http://example.com/räksmörgås!!!ENCODE!!!, http%3a%2f%2fexample.com%2fr%e4ksm%f6rg%e5s",
 		})
 	public void clean(String test, String result){
 		assertEquals(result, parser.Clean(test));

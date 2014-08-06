@@ -121,6 +121,7 @@ public class VideoInfoTag {
 		xmlTagMapping.put("status", "status");
 		xmlTagMapping.put("code", "productionCode");
 		xmlTagMapping.put("album", "album");
+		xmlTagMapping.put("artist", "artist");
 		xmlTagMapping.put("trailer", "trailer");
 		xmlTagMapping.put("basepath", "basePath");
 		xmlTagMapping.put("mpaa", "MPAARating");

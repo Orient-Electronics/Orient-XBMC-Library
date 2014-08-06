@@ -20,15 +20,89 @@ import orient.lib.xbmc.utils.URIUtils;
 
 public class VideoInfoScanner {
 
-	private NfoFile nfoReader;
-	private FileItem lastProcessedFileItem;
-
 	/**
 	 * return values from the information lookup functions
 	 */
 	public enum INFO_RET {
 		INFO_CANCELLED, INFO_ERROR, INFO_NOT_NEEDED, INFO_HAVE_ALREADY, INFO_NOT_FOUND, INFO_ADDED
 	}
+	/**
+	 * Finds a movie by a given name from the given scraper.
+	 * 
+	 * TODO check if its only finding movies or working with other videos as
+	 * well.
+	 * 
+	 * @param videoName
+	 * @param scraper
+	 * @return
+	 */
+	public static ScraperUrl findVideo(String videoName, Scraper scraper) {
+
+		ArrayList<ScraperUrl> movieList;
+
+		try {
+			movieList = scraper.findMovie(videoName, true);
+
+			// no results. try without cleaning chars like '.' and '_'
+			if (movieList == null || movieList.isEmpty())
+				movieList = scraper.findMovie(videoName, false);
+
+			if (movieList != null && !movieList.isEmpty())
+				return movieList.get(0);
+
+		} catch (ScraperError e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Loads the given file item with details of the given video. These details
+	 * are collected from both scraper and nfo file. Scraper data gets the
+	 * priority.
+	 * 
+	 * Logic different from XBMC: XBMC doesnt return anything if online scraper
+	 * fails. Our logic atleast sends the nfo data, if available.
+	 * 
+	 * TODO Recheck above logic, as nfo files may already be loaded at an earlier stage
+	 * TODO see if this can be renamed as "getVideoDetails"
+	 * 
+	 * @param item
+	 * @param url
+	 * @param scraper
+	 * @param nfoFile
+	 * @return
+	 */
+	public static FileItem getDetails(FileItem item, ScraperUrl url, Scraper scraper,
+			NfoFile nfoFile) {
+		
+		VideoInfoTag movieDetails = null;
+		
+		try {
+			movieDetails = scraper.getVideoDetails(url, true/*fMovie*/);
+		} catch (ScraperError e) {
+			e.printStackTrace();
+		}
+		
+		if (item.getVideoInfoTag() != null)
+			// TODO change this to merge
+			item.getVideoInfoTag().overwrite(movieDetails);
+		
+//		VideoInfoDownloader imdb = new VideoInfoDownloader(scraper);
+//		VideoInfoTag movieDetails = imdb.getDetails(url);
+		
+//		if (nfoFile != null)
+//			movieDetails = nfoFile.getDetails(movieDetails, true);
+		
+		item.setFromVideoInfoTag(movieDetails);
+
+		return item;
+	}
+
+	private NfoFile nfoReader;
+
+	private FileItem lastProcessedFileItem;
 
 	public VideoInfoScanner() {
 		nfoReader = new NfoFile();
@@ -137,6 +211,12 @@ public class VideoInfoScanner {
 		// CURL::GetRedacted(strNfoFile).c_str());
 
 		return result;
+	}
+
+	
+	
+	public FileItem getLastProcessedFileItem() {
+		return lastProcessedFileItem;
 	}
 
 	/**
@@ -298,14 +378,15 @@ public class VideoInfoScanner {
 	 * @param dirNames
 	 *            seems to be "grabAny" for getting NFO
 	 * @param scraper
-	 * @param useLocal
-	 * @param scraperUrl
-	 *            not required, only used as reference in XBMC
+	 * @param useLocal Use local data (nfo files)?
 	 * @return
 	 */
 	public INFO_RET retrieveInfoForMovie(FileItem item, boolean dirNames,
 			Scraper scraper, boolean useLocal) {
 
+		if(lastProcessedFileItem != null)
+			lastProcessedFileItem.reset();
+		
 		lastProcessedFileItem = item;
 		
 		if (item.isFolder() || !item.isVideo() || item.isNFO())
@@ -371,6 +452,7 @@ public class VideoInfoScanner {
 	    
 		
 		// Compensation of above
+		// Processing NFO Result
 		if (result == NFOResult.COMBINED_NFO)
 			lastProcessedFileItem.setFromVideoInfoTag(nfoReader.getVideoInfoTag());
 	    
@@ -410,87 +492,81 @@ public class VideoInfoScanner {
 		return INFO_RET.INFO_NOT_FOUND;
 	}
 
-	
-	
-	public FileItem getLastProcessedFileItem() {
-		return lastProcessedFileItem;
-	}
-
-	public void setLastProcessedFileItem(FileItem lastProcessedFileItem) {
-		this.lastProcessedFileItem = lastProcessedFileItem;
-	}
-
 	/**
-	 * Loads the given file item with details of the given video. These details
-	 * are collected from both scraper and nfo file. Scraper data gets the
-	 * priority.
-	 * 
-	 * Logic different from XBMC: XBMC doesnt return anything if online scraper
-	 * fails. Our logic atleast sends the nfo data, if available.
-	 * 
-	 * TODO Recheck above logic, as nfo files may already be loaded at an earlier stage
-	 * TODO see if this can be renamed as "getVideoDetails"
 	 * 
 	 * @param item
-	 * @param url
+	 * @param dirNames
+	 *            seems to be "grabAny" for getting NFO
 	 * @param scraper
-	 * @param nfoFile
+	 * @param useLocal Use local data (nfo files)?
 	 * @return
 	 */
-	public static FileItem getDetails(FileItem item, ScraperUrl url, Scraper scraper,
-			NfoFile nfoFile) {
+	public INFO_RET retrieveInfoForMusicVideo(FileItem item, boolean dirNames,
+			Scraper scraper, boolean useLocal) {
 		
-		VideoInfoTag movieDetails = null;
+		if(lastProcessedFileItem != null)
+			lastProcessedFileItem.reset();
 		
-		try {
-			movieDetails = scraper.getVideoDetails(url, true/*fMovie*/);
-		} catch (ScraperError e) {
-			e.printStackTrace();
-		}
+		lastProcessedFileItem = item;
 		
-		if (item.getVideoInfoTag() != null)
-			// TODO change this to merge
-			item.getVideoInfoTag().overwrite(movieDetails);
-		
-//		VideoInfoDownloader imdb = new VideoInfoDownloader(scraper);
-//		VideoInfoTag movieDetails = imdb.getDetails(url);
-		
-//		if (nfoFile != null)
-//			movieDetails = nfoFile.getDetails(movieDetails, true);
-		
-		item.setFromVideoInfoTag(movieDetails);
+		if (item.isFolder() || !item.isVideo() || item.isNFO() ||
+				(item.isPlayList() && !URIUtils.hasExtension(item.getPath(), ".strm")))
+			
+			return INFO_RET.INFO_NOT_NEEDED;
 
-		return item;
+//		TODO db
+//	    if (m_database.HasMusicVideoInfo(pItem->GetPath()))
+//	      return INFO_HAVE_ALREADY;
+
+	    
+	    // handle .nfo files
+	    NFOResult result = NFOResult.NO_NFO;
+
+	    if (useLocal)
+	      result = checkForNFOFile(item, dirNames, scraper);
+	    
+	    // Processing NFO Result
+	    if (result == NFOResult.FULL_NFO)
+	    {
+	    	lastProcessedFileItem.getVideoInfoTag().reset();
+	    	lastProcessedFileItem.setFromVideoInfoTag(nfoReader.getVideoInfoTag());
+
+	    	// TODO DB
+//	    	if (addVideo(pItem, info2.content(), bDirNames, true) < 0)
+//	    		return INFO_RET.INFO_ERROR;
+	      
+	      return INFO_RET.INFO_ADDED;
+	    }
+	    
+//	    if (result == NFOResult.URL_NFO || result == NFOResult.COMBINED_NFO)
+//	      pURL = scrUrl;
+
+
+	    // Data fetch
+	    ScraperUrl videoUrl = findVideo(lastProcessedFileItem.getMovieName(dirNames), scraper);
+
+	    if (videoUrl == null)
+	    	return INFO_RET.INFO_NOT_FOUND;
+
+	    NfoFile nfoFile = (result == NFOResult.COMBINED_NFO) ? nfoReader : null;
+
+	    lastProcessedFileItem = getDetails(lastProcessedFileItem, videoUrl, scraper, nfoFile);
+
+	    if (lastProcessedFileItem.getVideoInfoTag() != null) {
+
+	    	// TODO DB
+	    	// if (AddVideo(pItem, info2->Content(), bDirNames, useLocal) < 0)
+	    	// return INFO_ERROR;
+
+	    	return INFO_RET.INFO_ADDED;
+	    }
+
+	    // TODO: This is not strictly correct as we could fail to download
+	    // information here or error, or be cancelled
+	    return INFO_RET.INFO_NOT_FOUND;
 	}
-
-	/**
-	 * Finds a movie by a given name from the given scraper.
-	 * 
-	 * TODO check if its only finding movies or working with other videos as
-	 * well.
-	 * 
-	 * @param videoName
-	 * @param scraper
-	 * @return
-	 */
-	public static ScraperUrl findVideo(String videoName, Scraper scraper) {
-
-		ArrayList<ScraperUrl> movieList;
-
-		try {
-			movieList = scraper.findMovie(videoName, true);
-
-			// no results. try without cleaning chars like '.' and '_'
-			if (movieList == null || movieList.isEmpty())
-				movieList = scraper.findMovie(videoName, false);
-
-			if (movieList != null && !movieList.isEmpty())
-				return movieList.get(0);
-
-		} catch (ScraperError e) {
-			e.printStackTrace();
-		}
-
-		return null;
+	
+	public void setLastProcessedFileItem(FileItem lastProcessedFileItem) {
+		this.lastProcessedFileItem = lastProcessedFileItem;
 	}
 }

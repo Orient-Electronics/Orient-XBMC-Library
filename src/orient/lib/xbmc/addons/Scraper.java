@@ -320,10 +320,8 @@ public class Scraper extends Addon {
 				// ID
 				Element pxnId = XMLUtils.getFirstChildElement(pxeMovie, "id");
 
-				if (pxnId == null || pxnId.getFirstChild() == null)
-					continue;
-
-				scurlMovie.strId = pxnId.getFirstChild().getNodeValue();
+				if (pxnId != null && pxnId.getFirstChild() != null)
+					scurlMovie.strId = pxnId.getFirstChild().getNodeValue();
 				
 				Element pxnTitle = XMLUtils.getFirstChildElement(pxeMovie, "title");
 

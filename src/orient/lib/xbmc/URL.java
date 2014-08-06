@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -686,6 +687,12 @@ public class URL {
 	//modified to be more accomodating - if a non hex value follows a % take the characters directly and don't raise an error.
 	// However % characters should really be escaped like any other non safe character (www.rfc-editor.org/rfc/rfc1738.txt)
 	{
+		
+		//////// For the implemented encoder, use this to decode///////
+//		int hexToInt = Integer.parseInt(hex, 16);
+//		char intToChar = (char)hexToInt;
+		
+		
 		if (strURLData == null)
 			return null;
 		
@@ -726,7 +733,7 @@ public class URL {
 		return strResult;
 	}
 
-	public String Encode( String strURLData)
+	public static String Encode( String strURLData)
 	{
 		String strResult = "";
 
@@ -737,10 +744,11 @@ public class URL {
 
 			// Don't URL encode "-_.!()" according to RFC1738
 			// TODO: Update it to "-_.~" after Gotham according to RFC3986
-			if (Character.isLetterOrDigit(kar) || kar == '-' || kar == '.' || kar == '_' || kar == '!' || kar == '(' || kar == ')')
+			if (CharUtils.isAsciiAlphanumeric(kar) || kar == '-' || kar == '.' || kar == '_' || kar == '!' || kar == '(' || kar == ')')
 				strResult += kar;
 			else
-				strResult += "".format("%%%02.2x", ( int)(( char)kar)); // TODO: Change to "%%%02.2X" after Gotham
+				strResult += String.format("%%%02x", (int) kar); // TODO: Change to "%%%02.2X" after Gotham
+//			strResult += String.format("%%%02.2x", ( int)(( char)kar)); // TODO: Change to "%%%02.2X" after Gotham
 		}
 
 		return strResult;

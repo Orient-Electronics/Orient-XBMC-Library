@@ -325,4 +325,41 @@ public class FileItem {
 		return strMovieName;
 	}
 
+	public boolean isPlayList() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public void reset()
+	{
+	  // CGUIListItem members...
+//	  label2.clear();
+//	  SetLabel("");
+//	  FreeIcons();
+//	  overlayIcon = ICON_OVERLAY_NONE;
+//	  selected = false;
+	  isFolder = false;
+
+	  DVDLabel = null;
+	  title = null;
+	  path = null;
+	  dateTime = null;
+//	  lockCode.clear();
+	  mimetype = null;
+	  
+//	  musicInfoTag = null;
+	  videoInfoTag = null;
+//	  epgInfoTag = null;
+//	  pvrChannelInfoTag=NULL;
+//	  m_pvrRecordingInfoTag=NULL;
+//	  m_pvrTimerInfoTag=NULL;
+//	  m_pictureInfoTag=NULL;
+	  
+	  extrainfo = null;
+//	  ClearProperties();
+
+	  initialize();
+//	  SetInvalid();
+	}
+
 }
