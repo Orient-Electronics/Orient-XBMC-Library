@@ -2,15 +2,12 @@ package orient.lib.xbmc;
 
 import java.io.File;
 import java.util.Map;
-import java.util.ArrayList;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import orient.lib.xbmc.utils.URIUtils;
-import orient.lib.xbmc.filesystem.StackDirectory;
 
 public class URL {
 
@@ -270,7 +267,7 @@ public class URL {
 		{
 			if (m_strHostName != "" && m_strFileName != "")
 			{
-				m_strFileName = "".format("%s/%s", m_strHostName, m_strFileName);
+				m_strFileName = String.format("%s/%s", m_strHostName, m_strFileName);
 				m_strHostName = "";
 			}
 			else
@@ -639,7 +636,7 @@ public class URL {
 				strURL += m_strHostName;
 			if (HasPort())
 			{
-				String strPort = "".format("%i", m_iPort);
+				String strPort = String.format("%i", m_iPort);
 				strURL += ":";
 				strURL += strPort;
 			}
@@ -683,15 +680,10 @@ public class URL {
 		return false;
 	}
 
-	public String Decode( String strURLData)
+	public static String Decode( String strURLData)
 	//modified to be more accomodating - if a non hex value follows a % take the characters directly and don't raise an error.
 	// However % characters should really be escaped like any other non safe character (www.rfc-editor.org/rfc/rfc1738.txt)
 	{
-		
-		//////// For the implemented encoder, use this to decode///////
-//		int hexToInt = Integer.parseInt(hex, 16);
-//		char intToChar = (char)hexToInt;
-		
 		
 		if (strURLData == null)
 			return null;
@@ -702,7 +694,7 @@ public class URL {
 
 		for ( int i = 0; i < strURLData.length(); ++i)
 		{
-			int kar = ( char)strURLData.charAt(i);
+			char kar = strURLData.charAt(i);
 			if (kar == '+') strResult += ' ';
 			else if (kar == '%')
 			{
@@ -712,9 +704,8 @@ public class URL {
 					strTmp = strURLData.substring(i + 1, (i + 1) + 2);
 					int dec_num=-1;
 					
-					// TODO Will have to do with regex
 //					sscanf(strTmp, "%x", (int)dec_num);
-					
+					dec_num = Integer.parseInt(strTmp, 16);
 					
 					if (dec_num<0 || dec_num>255)
 						strResult += kar;

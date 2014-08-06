@@ -26,4 +26,20 @@ public class URLTest {
 		
 		assertEquals(path, url.Get());
 	}
+	
+	@Test
+	@Parameters({
+		"http://example.com/räksmörgås, http%3a%2f%2fexample.com%2fr%e4ksm%f6rg%e5s"
+	})
+	public void Encode(String test, String result) {
+		assertEquals(result, URL.Encode(test));
+	}
+	
+	@Test
+	@Parameters({
+		"http%3a%2f%2fexample.com%2fr%e4ksm%f6rg%e5s, http://example.com/räksmörgås"
+	})
+	public void Decode(String test, String result) {
+		assertEquals(result, URL.Decode(test));
+	}
 }
