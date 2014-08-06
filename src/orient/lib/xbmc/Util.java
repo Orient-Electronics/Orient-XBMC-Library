@@ -12,23 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import orient.lib.xbmc.utils.URIUtils;
 
 public class Util {
-
-	private static Util instance = null;
-
-	protected Util() {
-		// Exists only to defeat instantiation.
-	}
-
-	public static Util getInstance() {
-		if (instance == null) {
-			instance = new Util();
-		}
-		return instance;
-	}
-	
-
-
-	public Map<String, String> CleanString (String fileName, boolean bRemoveExtension, boolean bCleanChars) {
+	public static Map<String, String> CleanString (String fileName, boolean bRemoveExtension, boolean bCleanChars) {
 
 		String strTitle = "";
 		String strTitleAndYear = "";

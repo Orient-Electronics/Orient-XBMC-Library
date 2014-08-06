@@ -227,9 +227,7 @@ public class Scraper extends Addon {
 	public ArrayList<ScraperUrl> findMovie(String movie, boolean cleanChars)
 			throws ScraperError {
 
-		Util util = Util.getInstance();
-
-		Map<String, String> result = util.CleanString(movie, true, cleanChars);
+		Map<String, String> result = Util.CleanString(movie, true, cleanChars);
 
 		String sTitle = result.get("title");
 		String sYear = result.get("year");
