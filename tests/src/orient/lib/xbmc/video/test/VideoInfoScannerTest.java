@@ -2,7 +2,6 @@ package orient.lib.xbmc.video.test;
 
 import static junitparams.JUnitParamsRunner.$;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 

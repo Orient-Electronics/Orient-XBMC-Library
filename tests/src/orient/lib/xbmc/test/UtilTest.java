@@ -13,21 +13,6 @@ import orient.lib.xbmc.Util;
 @RunWith(JUnitParamsRunner.class)
 public class UtilTest extends TestCase {
 
-//	@Test
-//	public void testTitle() {
-//		assertEquals("Mission Impossible Ghost Protocol", result.get("title"));
-//	}
-//	
-//	@Test
-//	public void testYear() {
-//		assertEquals("2011", result.get("year"));
-//	}
-//	
-//	@Test
-//	public void testTitleAndYear() {
-//		assertEquals("Mission Impossible Ghost Protocol (2011)", result.get("titleAndYear"));
-//	}
-
 	@Test
 	@Parameters({
 		"Mission Impossible Ghost Protocol [2011] 720p BRRip [Dual Audio] [English + Hindi] x264 BUZZccd [WBRG].mkv, "

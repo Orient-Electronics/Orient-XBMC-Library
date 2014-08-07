@@ -393,7 +393,7 @@ public class Scraper extends Addon {
 	}
 
 	// fetch list of episodes from URL (from video database)
-	public ArrayList<Episode> getEpisodeList(ScraperUrl scurl)
+	public ArrayList<Episode> getEpisodeList(ScraperUrl scurl) throws ScraperError
 	{
 		ArrayList<Episode> vcep = new ArrayList<Episode>();
 		
@@ -401,7 +401,7 @@ public class Scraper extends Addon {
 	    return vcep;
 
 
-	  ArrayList<String> vcsIn;
+	  ArrayList<String> vcsIn = new ArrayList<String>();
 	  vcsIn.add(scurl.m_url.get(0).m_url);
 	  
 	  ArrayList<String> vcsOut = run("GetEpisodeList", scurl, vcsIn);
@@ -430,12 +430,12 @@ public class Scraper extends Addon {
 	      Element epEl = XMLUtils.getFirstChildElement(pxeMovie, "epnum");
 	      Element titleEl = XMLUtils.getFirstChildElement(pxeMovie, "title");
 
-	      Episode ep;
+	      Episode ep = new Episode();
 	      ep.season = XMLUtils.getFirstChildValue_int(seasonEl);
 	      String strEpNum = XMLUtils.getFirstChildValue(seasonEl);
 	      
 
-	      if (pxeLink != null && ep.season != null && strEpNum != null && !strEpNum.isEmpty())
+	      if (pxeLink != null && ep.season > -1 && strEpNum != null && !strEpNum.isEmpty())
 	      {
 	        ScraperUrl scurlEp = ep.scraperUrl;
 	        
@@ -631,9 +631,9 @@ public class Scraper extends Addon {
 		int i;
 		for (i=0;i<scrURL.m_url.size();++i)
 		{
-			m_parser.m_param[i] = ScraperUrl.Get(scrURL.m_url.get(i),getId());
+			m_parser.params[i] = ScraperUrl.Get(scrURL.m_url.get(i),getId());
 
-			if (m_parser.m_param[i] == null || m_parser.m_param[i].length() == 0)
+			if (m_parser.params[i] == null || m_parser.params[i].length() == 0)
 				return "";
 		}
 
@@ -641,10 +641,10 @@ public class Scraper extends Addon {
 		if (!extras.isEmpty())
 		{
 			for (int j=0;j<extras.size();++j)
-				m_parser.m_param[j+i] = extras.get(j);
+				m_parser.params[j+i] = extras.get(j);
 		}
 
-		return m_parser.Parse(function,this);
+		return m_parser.parse(function,this);
 	}
 
 	public boolean isNoop() {
@@ -657,7 +657,7 @@ public class Scraper extends Addon {
 		if (m_fLoaded)
 			return true;
 
-		boolean result = m_parser.Load(getLibPath());
+		boolean result = m_parser.load(getLibPath());
 
 		if (!result)
 			return false;
@@ -679,7 +679,7 @@ public class Scraper extends Addon {
 			Document doc = XMLUtils.getDocument(addon.getLibPath());
 
 			if (addon.getType() == ADDON_TYPE.ADDON_SCRAPER_LIBRARY && doc != null)
-				m_parser.AppendDocument(doc);
+				m_parser.appendDocument(doc);
 		}
 
 		m_fLoaded = true;
@@ -813,7 +813,7 @@ public class Scraper extends Addon {
 				// since $$1 will always either contain the data from an 
 				// url or the parameters to a chain, we can safely clear it here
 				// to fix this issue
-				m_parser.m_param[0] = null;
+				m_parser.params[0] = null;
 				ArrayList<String> result2 = run(szFunction,scrURL2, extras2);
 				
 				if(result2 != null)
@@ -846,7 +846,7 @@ public class Scraper extends Addon {
 	}
 	
 	String searchStringEncoding() { 
-		return m_parser.GetSearchStringEncoding(); 
+		return m_parser.getSearchStringEncoding(); 
 	}
 
 	

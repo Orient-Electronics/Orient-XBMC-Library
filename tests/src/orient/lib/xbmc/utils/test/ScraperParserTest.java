@@ -1,6 +1,10 @@
 package orient.lib.xbmc.utils.test;
 
 import static org.junit.Assert.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
@@ -22,15 +26,13 @@ public class ScraperParserTest {
 	public ScraperParserTest() {
 		Settings settings = Settings.getInstance();
 		assetsPath = settings.getAssetsDirPath();
+		parser = new ScraperParser();
 	}
 
 	@Before
-	public void setUp() throws Exception {
-		parser = new ScraperParser();
-		
+	public void setUp() throws Exception {		
 		String filePath = assetsPath + "xbmc-addons\\addons\\metadata.themoviedb.org\\tmdb.xml";
-	
-		loadResult = parser.Load(filePath);
+		loadResult = parser.load(filePath);
 	}
 	
 	@Test
@@ -45,16 +47,22 @@ public class ScraperParserTest {
 		"!!!FIXCHARS!!!   ?   !!!FIXCHARS!!!, ?",
 		"!!!ENCODE!!!http://example.com/räksmörgås!!!ENCODE!!!, http%3a%2f%2fexample.com%2fr%e4ksm%f6rg%e5s",
 		})
-	public void clean(String test, String result){
-		assertEquals(result, parser.Clean(test));
+	public void clean(String test, String expectedResult) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		
+		Method method = parser.getClass().getDeclaredMethod("clean", String.class);
+		method.setAccessible(true);
+		String result = (String) method.invoke(parser, test);
+		
+		
+		assertEquals(expectedResult, result);
 	}
 	
 	@Test
 	public void parse(){
-		parser.m_param[0] = "Mission%20Impossible%20Ghost%20Protocol";
-		parser.m_param[1] = "2011";
+		parser.params[0] = "Mission%20Impossible%20Ghost%20Protocol";
+		parser.params[1] = "2011";
 		
-		String actualResult = parser.Parse("CreateSearchUrl", null);
+		String actualResult = parser.parse("CreateSearchUrl", null);
 		
 		// Language will be empty because settings not loaded. 
 		// Settings will load if this parser is created by an addon
@@ -65,10 +73,16 @@ public class ScraperParserTest {
 	
 	
 	@Test
-	public void insertToken(){
+	public void insertToken() throws NoSuchMethodException,
+			IllegalAccessException, IllegalArgumentException,
+			InvocationTargetException {
 		String str = "foo\\5bar";
-		String result = parser.InsertToken(str, 5, "$$$");
-		
+
+		Method method = parser.getClass().getDeclaredMethod("insertToken",
+				String.class, int.class, String.class);
+		method.setAccessible(true);
+		String result = (String) method.invoke(parser, str, 5, "$$$");
+
 		assertEquals("foo$$$\\5$$$bar", result);
 	}
 
