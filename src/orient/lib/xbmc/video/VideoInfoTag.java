@@ -1,13 +1,10 @@
 package orient.lib.xbmc.video;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -23,18 +20,18 @@ import orient.lib.xbmc.utils.StreamDetailVideo;
 import orient.lib.xbmc.utils.StreamDetails;
 import orient.lib.xbmc.utils.XMLUtils;
 
-public class VideoInfoTag {
+public class VideoInfoTag extends InfoTag {
 
 	/**
 	 * the base path of the video, for folder-based lookups
 	 */
-	public String basePath; 
- 
+	public String basePath;
+
 	/**
 	 * the parent path id where the base path of the video lies
 	 */
 	public int parentPathID;
-	
+
 	public ArrayList<String> artist;
 	public ArrayList<String> country;
 	public ArrayList<String> director;
@@ -44,7 +41,7 @@ public class VideoInfoTag {
 	public ArrayList<String> tags;
 	public ArrayList<String> writingCredits;
 	public ArrayList<ActorInfo> cast;
-	
+
 	public String tagline;
 	public String plotOutline;
 	public String trailer;
@@ -82,8 +79,9 @@ public class VideoInfoTag {
 	public int bookmarkId;
 	public int idShow;
 	public int idSeason;
-	public int duration; // /< duration in seconds
-	
+	/** duration in seconds */
+	public int duration;
+
 	public float rating;
 	public float epBookmark;
 
@@ -96,14 +94,18 @@ public class VideoInfoTag {
 	public ScraperUrl fanartUrl; // instead of CFanart fanart;
 	public StreamDetails streamDetails;
 	public Bookmark resumePoint;
+
 	// MediaType type;
-
-
-	private Map<String, String> xmlTagMapping = new HashMap<String, String>();
 
 	public VideoInfoTag() {
 		super();
 
+		initXmlTagMapping();
+		reset();
+	}
+
+	@Override
+	protected void initXmlTagMapping() {
 		// Strings
 		xmlTagMapping.put("id", "IMDBNumber");
 		xmlTagMapping.put("title", "title");
@@ -138,17 +140,17 @@ public class VideoInfoTag {
 		xmlTagMapping.put("specialAfterSeason", "specialAfterSeason");
 		xmlTagMapping.put("playcount", "playCount");
 		xmlTagMapping.put("runtime", "duration");
-		
+
 		// Floats
 		xmlTagMapping.put("rating", "rating");
 		xmlTagMapping.put("epbookmark", "epBookmark");
-		
+
 		// Date
 		xmlTagMapping.put("lastplayed", "lastPlayed");
 		xmlTagMapping.put("premiered", "premiered");
 		xmlTagMapping.put("aired", "firstAired");
 		xmlTagMapping.put("dateadded", "dateAdded");
-		
+
 		// ArrayLists
 		xmlTagMapping.put("genre", "genre");
 		xmlTagMapping.put("country", "country");
@@ -158,16 +160,315 @@ public class VideoInfoTag {
 		xmlTagMapping.put("tag", "tags");
 		xmlTagMapping.put("studio", "studio");
 		xmlTagMapping.put("actor", "cast");
-		
+
 		// Other
 		xmlTagMapping.put("thumb", "pictureUrl");
 		xmlTagMapping.put("fanart", "fanartUrl");
 		xmlTagMapping.put("fileinfo", "streamDetails");
 		xmlTagMapping.put("resume", "resumePoint");
-		
-		
-		
-		reset();
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addArrayItem(String fieldName, Element valueEl) {
+
+		String genericType = getGenericTypeName(fieldName);
+
+		if (genericType.equals("String")) {
+
+			ArrayList<String> arr;
+			Field f;
+
+			try {
+				f = getClass().getDeclaredField(fieldName);
+				f.setAccessible(true);
+
+				if (f.get(this) == null) {
+					arr = new ArrayList<String>();
+				} else {
+					arr = (ArrayList<String>) f.get(this);
+				}
+
+				String item = XMLUtils.getFirstChildValue(valueEl);
+
+				arr.add((String) item);
+				getClass().getDeclaredField(fieldName).set(this, arr);
+
+			} catch (NoSuchFieldException | IllegalAccessException
+					| IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+		} else if (genericType.equals("ActorInfo")) {
+			ArrayList<ActorInfo> arr;
+			Field f;
+
+			try {
+				f = getClass().getDeclaredField(fieldName);
+				f.setAccessible(true);
+
+				if (f.get(this) == null) {
+					arr = new ArrayList<ActorInfo>();
+				} else {
+					arr = (ArrayList<ActorInfo>) f.get(this);
+				}
+
+				ActorInfo item = new ActorInfo();
+				item.parseElement(valueEl);
+
+				arr.add((ActorInfo) item);
+				getClass().getDeclaredField(fieldName).set(this, arr);
+
+			} catch (NoSuchFieldException | IllegalAccessException
+					| IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public void merge(VideoInfoTag that) {
+		// TODO implement this
+	}
+
+	/**
+	 * Overwrites the current info tag with the given Info Tag
+	 * 
+	 * @param that
+	 */
+	public void overwrite(VideoInfoTag that) {
+
+		Iterator<Entry<String, String>> it = xmlTagMapping.entrySet()
+				.iterator();
+
+		while (it.hasNext()) {
+
+			Map.Entry<String, String> pair = (Entry<String, String>) it.next();
+
+			String fieldName = (String) pair.getValue();
+			String fieldType;
+
+			try {
+				fieldType = getFieldType(fieldName);
+
+				Field thisField = this.getClass().getDeclaredField(fieldName);
+				Field thatField = that.getClass().getDeclaredField(fieldName);
+
+				switch (fieldType) {
+
+				case "int":
+
+					// if (thatField.getInt(this) > 0)
+					thisField.set(this, thatField.getInt(that));
+
+					break;
+				case "float":
+
+					// if (thatField.getFloat(this) > 0)
+					thisField.set(this, thatField.getFloat(that));
+
+					break;
+				case "String":
+				case "Date":
+				case "ArrayList":
+				default:
+
+					// if (thatField.get(that) != null)
+					thisField.set(this, thatField.get(that));
+
+					break;
+				}
+			} catch (NoSuchFieldException | IllegalAccessException
+					| IllegalArgumentException e) {
+				e.printStackTrace();
+				continue;
+			}
+
+			it.remove(); // avoids a ConcurrentModificationException
+		}
+	}
+
+	/**
+	 * Parse our native XML format for video info. See Load for a description of
+	 * the available tag types.
+	 * 
+	 * @param element
+	 *            the root XML element to parse.
+	 * @param prioritise
+	 *            whether additive tags should be replaced (or prepended) by the
+	 *            content of the tags, or appended to.
+	 * @throws ParseException
+	 * @see Load
+	 */
+	protected void parseNative(Element element, boolean prioritise)
+			throws IllegalAccessException, IllegalArgumentException,
+			NoSuchFieldException, ParseException, NullPointerException {
+
+		Element child = XMLUtils.getFirstChildElement(element);
+
+		while (child != null) {
+
+			String tag = child.getNodeName();
+
+			String memberName;
+			String fieldType;
+
+			if (xmlTagMapping.containsKey(tag)) {
+
+				memberName = xmlTagMapping.get(tag);
+				fieldType = getFieldType(memberName);
+
+				if (fieldType.equals("String")) {
+					setField(memberName, XMLUtils.getFirstChildValue(child));
+				} else if (fieldType.equals("int")) {
+					setField(memberName, processParsedInt(child));
+				} else if (fieldType.equals("float")) {
+					setField(memberName,
+							XMLUtils.getFirstChildValue_float(child));
+				} else if (fieldType.equals("Date")) {
+					String dateStr = XMLUtils.getFirstChildValue(child);
+
+					if (dateStr != null) {
+						Date date = new SimpleDateFormat("yyyy-MM-dd",
+								Locale.ENGLISH).parse(dateStr);
+						setField(memberName, date);
+					}
+				} else if (fieldType.equals("ArrayList")) {
+					addArrayItem(memberName, child);
+				} else {
+					processParsedOther(child);
+				}
+			}
+
+			child = XMLUtils.getNextSiblingElement(child);
+		}
+
+		// ///// Post Processing
+
+		// Special Season
+		if (specialAfterSeason > 0) {
+			specialSortSeason = specialAfterSeason;
+			specialSortEpisode = 0x1000; // should be more than any realistic
+		}
+	}
+
+	/**
+	 * Used by the ParseNative method. Performs any further processing on the
+	 * value if required.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 */
+	private int processParsedInt(Element el) {
+
+		String tag = el.getNodeName();
+		int value = XMLUtils.getFirstChildValue_int(el);
+
+		// Runtime and Duration
+		if (tag == "runtime") {
+			value = value * 60;
+		}
+		// Rating
+		else if (tag == "rating") {
+
+			try {
+				int max_value = Integer.parseInt(XMLUtils.getAttribute(el,
+						"max"));
+
+				if (max_value >= 1)
+					value = value / max_value * 10; // Normalise the Movie
+													// Rating to between 1 and
+													// 10
+			} catch (NumberFormatException e) {
+			}
+		}
+
+		return value;
+	}
+
+	/**
+	 * Used by the ParseNative method. Performs any further processing on the
+	 * value if required.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 */
+	private void processParsedOther(Element el) {
+
+		String tag = el.getNodeName();
+
+		// Thumbs
+		if (tag == "thumb") {
+
+			if (pictureUrl == null)
+				pictureUrl = new ScraperUrl();
+
+			pictureUrl.ParseElement(el);
+		}
+		if (tag == "fanart") {
+
+			if (fanartUrl == null)
+				fanartUrl = new ScraperUrl();
+
+			fanartUrl.ParseElement(el);
+		} else if (tag == "fileinfo") {
+			Element streamEl = XMLUtils.getFirstChildElement(el,
+					"streamdetails");
+
+			if (streamEl == null)
+				return;
+
+			Element typeEl = XMLUtils.getFirstChildElement(streamEl);
+
+			while (typeEl != null) {
+
+				StreamDetail p;
+				switch (typeEl.getNodeName()) {
+				case "video":
+					p = new StreamDetailVideo();
+					break;
+
+				case "audio":
+					p = new StreamDetailAudio();
+					break;
+
+				case "subtitle":
+					p = new StreamDetailSubtitle();
+					break;
+
+				default:
+					return;
+				}
+
+				p.parseElement(typeEl);
+
+				if (streamDetails == null)
+					streamDetails = new StreamDetails();
+
+				streamDetails.AddStream(p);
+
+				typeEl = XMLUtils.getNextSiblingElement(typeEl);
+			}
+		} else if (tag == "resume") {
+			Element position = XMLUtils.getFirstChildElement(el, "position");
+
+			if (position != null) {
+				String value = XMLUtils.getFirstChildValue(position);
+
+				if (value != null && !value.trim().isEmpty())
+					resumePoint.timeInSeconds = Double
+							.parseDouble(value.trim());
+			}
+
+			Element total = XMLUtils.getFirstChildElement(el, "total");
+
+			if (total != null) {
+				String value = XMLUtils.getFirstChildValue(total);
+
+				if (value != null && !value.trim().isEmpty())
+					resumePoint.totalTimeInSeconds = Double.parseDouble(value);
+			}
+		}
+
+		return;
 	}
 
 	public void reset() {
@@ -180,14 +481,14 @@ public class VideoInfoTag {
 		tags = null;
 		studio = null;
 		artist = null;
-		showLink = null;			
+		showLink = null;
 
 		// Other
-		//		  fanart.m_xml.clear();
+		// fanart.m_xml.clear();
 		streamDetails = null;
 		resumePoint = new Bookmark();
 		resumePoint.type = Bookmark.Type.RESUME;
-		//		  type.clear();
+		// type.clear();
 
 		// Strings
 		tagline = null;
@@ -242,454 +543,5 @@ public class VideoInfoTag {
 		lastPlayed = null;
 		dateAdded = null;
 
-	}
-	
-	
-	public void merge (VideoInfoTag that) {
-		// TODO implement this
-	}
-	
-	/**
-	 * Overwrites the current info tag with the given Info Tag
-	 * @param that
-	 */
-	public void overwrite(VideoInfoTag that) {
-
-		Iterator<Entry<String, String>> it = xmlTagMapping.entrySet().iterator();
-		
-	    while (it.hasNext()) {
-	    	
-			Map.Entry<String, String> pair = (Entry<String, String>)it.next();
-	        
-	        String fieldName = (String) pair.getValue();
-	        String fieldType;
-	        
-	        try {
-				fieldType = getFieldType(fieldName);
-
-				Field thisField = this.getClass().getDeclaredField(fieldName);
-				Field thatField = that.getClass().getDeclaredField(fieldName);
-				
-				switch (fieldType) {
-				
-				case "int":
-					
-//					if (thatField.getInt(this) > 0)
-						thisField.set(this, thatField.getInt(that));
-					
-					break;
-				case "float":
-					
-//					if (thatField.getFloat(this) > 0)
-						thisField.set(this, thatField.getFloat(that));
-					
-					break;
-				case "String":
-				case "Date":
-				case "ArrayList":
-				default:
-					
-//					if (thatField.get(that) != null)
-						thisField.set(this, thatField.get(that));
-					
-					break;
-				}
-			} catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-				e.printStackTrace();
-				continue;
-			}
-	        
-	        it.remove(); // avoids a ConcurrentModificationException
-	    }
-	}
-
-	/**
-	 * Load information to a videoinfotag from an XML element There are three
-	 * types of tags supported:
-	 * 
-	 * <ol>
-	 * <li>Single-value tags, such as &lt;title&gt;. These are set if available,
-	 * else are left untouched.</li>
-	 * <li>Additive tags, such as &lt;set&gt; or &lt;genre&gt;. These are
-	 * appended to or replaced (if available) based on the value of the
-	 * prioritise parameter. In addition, a clear attribute is available in the
-	 * XML to clear the current value prior to appending.</li>
-	 * <li>Image tags such as &lt;thumb&gt; and &lt;fanart&gt;. If the
-	 * prioritise value is specified, any additional values are prepended to the
-	 * existing values.</li>
-	 * </ol>
-	 * 
-	 * @param element
-	 *            the root XML element to parse.
-	 * @param append
-	 *            whether information should be added to the existing tag, or
-	 *            whether it should be reset first.
-	 * @param prioritise
-	 *            if appending, whether additive tags should be prioritised
-	 *            (i.e. replace or prepend) over existing values. Defaults to
-	 *            false.
-	 * 
-	 * @see ParseNative
-	 */
-	public boolean load(Element element, boolean append, boolean prioritise) {
-		if (element == null)
-			return false;
-
-		if (!append)
-			reset();
-
-		try {
-			parseNative(element, prioritise);
-		} catch (IllegalAccessException | IllegalArgumentException
-				| NoSuchFieldException | NullPointerException | ParseException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Parse our native XML format for video info. See Load for a description of
-	 * the available tag types.
-	 * 
-	 * @param element
-	 *            the root XML element to parse.
-	 * @param prioritise
-	 *            whether additive tags should be replaced (or prepended) by the
-	 *            content of the tags, or appended to.
-	 * @throws ParseException 
-	 * @see Load
-	 */
-	private void parseNative(Element element, boolean prioritise)
-			throws IllegalAccessException, IllegalArgumentException,
-			NoSuchFieldException, ParseException, NullPointerException {
-
-		Element child = XMLUtils.getFirstChildElement(element);
-
-		while (child != null) {
-
-			String tag = child.getNodeName();
-
-			String memberName;
-			String fieldType;
-
-			if (xmlTagMapping.containsKey(tag)) {
-
-				memberName = xmlTagMapping.get(tag);
-				fieldType = getFieldType(memberName);
-
-				if (fieldType.equals("String")) 
-				{
-					setField(memberName, XMLUtils.getFirstChildValue(child));
-				} 
-				else if (fieldType.equals("int")) 
-				{
-					setField(memberName, processParsedInt(child));
-				} 
-				else if (fieldType.equals("float")) 
-				{
-					setField(memberName, XMLUtils.getFirstChildValue_float(child));
-				} 
-				else if (fieldType.equals("Date")) 
-				{
-					String dateStr = XMLUtils.getFirstChildValue(child);
-					
-					if (dateStr != null) {
-						Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH).parse(dateStr);
-						setField(memberName, date);
-					}
-				} 
-				else if (fieldType.equals("ArrayList")) 
-				{
-					addArrayItem(memberName, child);
-				}
-				else {
-					processParsedOther(child);
-				}
-			}
-
-			child = XMLUtils.getNextSiblingElement(child);
-		}
-
-		/////// Post Processing
-		 
-		// Special Season
-		if (specialAfterSeason > 0)
-		{
-			specialSortSeason = specialAfterSeason;
-			specialSortEpisode = 0x1000; // should be more than any realistic
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void addArrayItem(String fieldName, Element valueEl) {
-
-		String genericType = getGenericTypeName(fieldName);
-		
-		
-		if (genericType.equals("String")) {
-			
-			ArrayList<String> arr; 
-			Field f;
-			
-			try {
-				f = getClass().getDeclaredField(fieldName);
-				f.setAccessible(true);
-
-
-				if (f.get(this) == null) {
-					arr = new ArrayList<String>();
-				}
-				else {
-					arr = (ArrayList<String>) f.get(this);
-				}
-
-				String item = XMLUtils.getFirstChildValue(valueEl);
-
-				arr.add((String) item);
-				getClass().getDeclaredField(fieldName).set(this, arr);
-
-			} catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-				e.printStackTrace();
-			}
-		}
-		else if (genericType.equals("ActorInfo")) {
-			ArrayList<ActorInfo> arr; 
-			Field f;
-			
-			try {
-				f = getClass().getDeclaredField(fieldName);
-				f.setAccessible(true);
-				
-				
-				if (f.get(this) == null) {
-					arr = new ArrayList<ActorInfo>();
-				}
-				else {
-					arr = (ArrayList<ActorInfo>) f.get(this);
-				}
-				
-				ActorInfo item = new ActorInfo();
-				item.parseElement(valueEl);
-				
-				arr.add((ActorInfo) item);
-				getClass().getDeclaredField(fieldName).set(this, arr);
-				
-			} catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-
-	public String getGenericTypeName(String fieldName){
-
-		Field field;
-		try {
-			field = getClass().getDeclaredField(fieldName);
-			Type type = field.getGenericType();
-			
-			if (type instanceof ParameterizedType) {
-				
-				ParameterizedType pType = (ParameterizedType)type;
-				Type[] arr = pType.getActualTypeArguments();
-				
-				for (Type tp: arr) {
-					Class<?> clzz = (Class<?>)tp;
-					System.out.println(clzz.getName());
-					
-					return clzz.getSimpleName();
-				}
-				
-			}
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Used by the ParseNative method. Performs any further processing on the 
-	 * value if required.
-	 * 
-	 * @param el The element to extract the value from
-	 */
- 	private int processParsedInt(Element el) {
-
-		String tag = el.getNodeName();
-		int value = XMLUtils.getFirstChildValue_int(el);
-
-
-		// Runtime and Duration
-		if (tag == "runtime") {
-			value = value * 60;
-		}
-		// Rating
-		else if (tag == "rating") {
-
-			try {
-				int max_value = Integer.parseInt(XMLUtils.getAttribute(el, "max"));
-
-				if (max_value >= 1)
-					value = value / max_value * 10; // Normalise the Movie Rating to between 1 and 10
-			} catch (NumberFormatException e) {
-			}
-		}
-
-		return value;
-	}
-
-	/**
-	 * Used by the ParseNative method. Performs any further processing on the 
-	 * value if required.
-	 * 
-	 * @param el The element to extract the value from
-	 */
-	private void processParsedOther(Element el) {
-
-		String tag = el.getNodeName();
-
-		// Thumbs
-		if (tag == "thumb") {
-
-			if (pictureUrl == null)
-				pictureUrl = new ScraperUrl();
-
-			pictureUrl.ParseElement(el);
-		}
-		if (tag == "fanart") {
-			
-			if (fanartUrl == null)
-				fanartUrl = new ScraperUrl();
-			
-			fanartUrl.ParseElement(el);
-		}
-		else if (tag == "fileinfo") {
-			Element streamEl = XMLUtils.getFirstChildElement(el, "streamdetails");
-			
-			if (streamEl == null)
-				return;
-			
-			Element typeEl = XMLUtils.getFirstChildElement(streamEl);
-			
-			while (typeEl != null) {
-
-				StreamDetail p;
-				switch (typeEl.getNodeName()) {
-				case "video":
-					p = new StreamDetailVideo();
-					break;
-
-				case "audio":
-					p = new StreamDetailAudio();
-					break;
-
-				case "subtitle":
-					p = new StreamDetailSubtitle();
-					break;
-
-				default:
-					return;
-				}
-
-				p.parseElement(typeEl);
-
-				if (streamDetails == null)
-					streamDetails = new StreamDetails();
-
-				streamDetails.AddStream(p);
-				
-				typeEl = XMLUtils.getNextSiblingElement(typeEl);
-			}
-		}
-		else if (tag == "resume") {
-			Element position = XMLUtils.getFirstChildElement(el, "position");
-
-			if (position != null){
-				String value = XMLUtils.getFirstChildValue(position);
-				
-				if (value != null && !value.trim().isEmpty())
-					resumePoint.timeInSeconds = Double.parseDouble(value.trim());
-			}
-			
-			Element total = XMLUtils.getFirstChildElement(el, "total");
-			
-			if (total != null){
-				String value = XMLUtils.getFirstChildValue(total);
-				
-				if (value != null && !value.trim().isEmpty())
-					resumePoint.totalTimeInSeconds = Double.parseDouble(value);
-			}
-		}
-		
-		return;
-	}
-	
-	
-	
-	
-	
-	/**
-	 * Returns the variable type of a given member of the class.
-	 * 
-	 * @param fieldName The field to check
-	 * @return Field Type
-	 */
- 	private String getFieldType(String fieldName) throws NoSuchFieldException {
-		Field f = getClass().getDeclaredField(fieldName);
-
-		return f.getType().getSimpleName();
-	}
- 	
- 	
- 	
- 	
-	/**
-	 * Dynamically set a member of this class.
-	 *
-	 * @param fieldName The field to set
-	 * @param value The value to set
-	 */
-	private void setField(String fieldName, String value)
-			throws IllegalAccessException, IllegalArgumentException,
-			NoSuchFieldException {
-		getClass().getDeclaredField(fieldName).set(this, value);
-	}
-	
-	/**
-	 * Dynamically set a member of this class.
-	 *
-	 * @param fieldName The field to set
-	 * @param value The value to set
-	 */
-	private void setField(String fieldName, int value)
-			throws IllegalAccessException, IllegalArgumentException,
-			NoSuchFieldException {
-		getClass().getDeclaredField(fieldName).setInt(this, value);
-	}
-	
-	/**
-	 * Dynamically set a member of this class.
-	 *
-	 * @param fieldName The field to set
-	 * @param value The value to set
-	 */
-	private void setField(String fieldName, float value)
-			throws IllegalAccessException, IllegalArgumentException,
-			NoSuchFieldException {
-		getClass().getDeclaredField(fieldName).setFloat(this, value);
-	}
-
-	/**
-	 * Dynamically set a member of this class.
-	 *
-	 * @param fieldName The field to set
-	 * @param value The value to set
-	 */
-	private void setField(String fieldName, Date value)
-			throws IllegalAccessException, IllegalArgumentException,
-			NoSuchFieldException {
-		getClass().getDeclaredField(fieldName).set(this, value);
 	}
 }
