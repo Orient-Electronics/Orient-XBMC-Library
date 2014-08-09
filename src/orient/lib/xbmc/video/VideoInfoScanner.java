@@ -14,6 +14,8 @@ import orient.lib.xbmc.FileItemList;
 import orient.lib.xbmc.NfoFile;
 import orient.lib.xbmc.Settings;
 import orient.lib.xbmc.NfoFile.NFOResult;
+import orient.lib.xbmc.Util;
+import orient.lib.xbmc.addons.AddonManager;
 import orient.lib.xbmc.addons.Scraper;
 import orient.lib.xbmc.addons.ScraperError;
 import orient.lib.xbmc.filesystem.StackDirectory;
@@ -374,6 +376,89 @@ public class VideoInfoScanner {
 
 	}
 
+	
+//	public boolean retrieveVideoInfo(FileItemList items, boolean bDirNames, CONTENT_TYPE content, boolean useLocal, ScraperUrl pURL, boolean fetchEpisodes)
+//	{
+//	    // TODO DB
+////	    m_database.Open();
+//
+//	    boolean FoundSomeInfo = false;
+//	    
+//	    ArrayList<Integer> seenPaths = new ArrayList<Integer>();
+//	    
+//	    for (int i = 0; i < (int)items.size(); ++i)
+//	    {
+//	      nfoReader.close();
+//	      FileItem pItem = items.get(i);
+//
+//	      // we do this since we may have a override per dir
+//	      Scraper info2 = m_database.GetScraperForPath(pItem.isFolder() ? pItem.getPath() : items.getPath());
+//	      
+//	      if (info2 == null) // skip
+//	        continue;
+//
+//	      Settings settings = Settings.getInstance();
+//	      
+//	      // Discard all exclude files defined by regExExclude
+//	      if (Util.excludeFileOrFolder(pItem.getPath(), (content == CONTENT_TYPE.CONTENT_TVSHOWS) ? settings.getTvshowExcludeFromScanRegExps()
+//	                                                                                    : settings.getMoviesExcludeFromScanRegExps())
+//	        continue;
+//
+//
+//	      // clear our scraper cache
+////	      info2.ClearCache();
+//
+//	      INFO_RET ret = INFO_RET.INFO_CANCELLED;
+//	      
+//	      if (info2.content() == CONTENT_TYPE.CONTENT_TVSHOWS)
+//	        ret = retrieveInfoForTvShow(pItem, bDirNames, info2, useLocal, fetchEpisodes);
+//	      else if (info2.content() == CONTENT_TYPE.CONTENT_MOVIES)
+//	        ret = retrieveInfoForMovie(pItem, bDirNames, info2, useLocal);
+//	      else if (info2.content() == CONTENT_TYPE.CONTENT_MUSICVIDEOS)
+//	        ret = retrieveInfoForMusicVideo(pItem, bDirNames, info2, useLocal);
+//	      else
+//	      {
+////	        CLog::Log(LOGERROR, "VideoInfoScanner: Unknown content type %d (%s)", info2->Content(), CURL::GetRedacted(pItem->GetPath()).c_str());
+//	        FoundSomeInfo = false;
+//	        break;
+//	      }
+//	      if (ret == INFO_RET.INFO_CANCELLED || ret == INFO_RET.INFO_ERROR)
+//	      {
+//	        FoundSomeInfo = false;
+//	        break;
+//	      }
+//	      if (ret == INFO_RET.INFO_ADDED || ret == INFO_RET.INFO_HAVE_ALREADY)
+//	        FoundSomeInfo = true;
+//	      else if (ret == INFO_RET.INFO_NOT_FOUND)
+//	      {
+////	        CLog::Log(LOGWARNING, "No information found for item '%s', it won't be added to the library.", CURL::GetRedacted(pItem->GetPath()).c_str());
+//	      }
+//
+//	      pURL = null;
+//
+//	      // Keep track of directories we've seen
+//	      if (m_bClean && pItem.isFolder())
+//	        seenPaths.add(m_database.GetPathId(pItem.getPath()));
+//	    }
+//
+//	    if (content == CONTENT_TVSHOWS && ! seenPaths.empty())
+//	    {
+//	      vector< pair<int,string> > libPaths;
+//	      m_database.GetSubPaths(items.GetPath(), libPaths);
+//	      for (vector< pair<int,string> >::iterator i = libPaths.begin(); i < libPaths.end(); ++i)
+//	      {
+//	        if (find(seenPaths.begin(), seenPaths.end(), i->first) == seenPaths.end())
+//	          m_pathsToClean.insert(i->first);
+//	      }
+//	    }
+//	    if(pDlgProgress)
+//	      pDlgProgress->ShowProgressBar(false);
+//
+//	    g_infoManager.ResetLibraryBools();
+//	    m_database.Close();
+//	    return FoundSomeInfo;
+//	  }
+//	
 	/**
 	 * 
 	 * @param item

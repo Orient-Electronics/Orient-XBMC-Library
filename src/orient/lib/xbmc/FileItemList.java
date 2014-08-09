@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class FileItemList {
 	
+	private String path;
 	private ArrayList<FileItem> items;
 
 	public void add(FileItem item) {
@@ -56,5 +57,9 @@ public class FileItemList {
 	@SuppressWarnings("unused")
 	private void stackFiles() {
 		
+	}
+
+	public String getPath() {
+		return path;
 	}
 }

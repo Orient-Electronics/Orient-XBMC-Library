@@ -163,6 +163,23 @@ public class Util {
 		}
 		return result;
 	}
+
+	public static boolean excludeFileOrFolder(String strFileOrFolder,
+			ArrayList<String> regexps) {
+		
+		if (strFileOrFolder.isEmpty())
+		    return false;
+		
+		for (String regex : regexps) {
+			Pattern pattern = Pattern.compile(regex);			
+			Matcher matcher = pattern.matcher(strFileOrFolder);
+			
+			if (matcher.find())
+				return true;
+		}
+		
+		return false;
+	}
 	
 	
 	

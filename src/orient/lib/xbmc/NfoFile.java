@@ -34,13 +34,18 @@ public class NfoFile {
 	private VideoInfoTag videoInfoTag;
 	
 	public NfoFile() {
-		// TODO Auto-generated constructor stub
 	}
 
+	public void close() {
+		document = null;
+		headPos = 0;
+		scraperUrl.Clear();
+	}
+	
 	public NFOResult create(String strPath, Scraper info) {
 		return create(strPath, info, -1);
 	}
-	
+
 	/**
 	 * 
 	 * 
@@ -169,6 +174,8 @@ public class NfoFile {
 		return scraperUrl.m_url.isEmpty() ? NFOResult.NO_NFO : NFOResult.URL_NFO;
 	}
 
+	
+	
 	/**
 	 * Extract the ScraperUrl from NFO file using the given scraper.
 	 * 
@@ -196,13 +203,11 @@ public class NfoFile {
 
 		return scraperUrl.m_url.isEmpty() ? 1 : 0;
 	}
-
-	
 	
 	public VideoInfoTag getDetails() {
 		return getDetails(null, false);
 	}
-	
+
 	public VideoInfoTag getDetails(VideoInfoTag details) {
 		return getDetails(details, false);
 	}
@@ -234,17 +239,17 @@ public class NfoFile {
 		if (details == null)
 			details = new VideoInfoTag();
 		
-		details.load(doc.getDocumentElement(), true, prioritise);
+		details.loadXML(doc.getDocumentElement(), true, prioritise);
 		
 		return details; 
 	}
 
+	
+	
 	public Scraper getScraper() {
 		return scraper;
 	}
 
-	
-	
 	public ScraperUrl getScraperUrl() {
 		return scraperUrl;
 	}
@@ -252,7 +257,7 @@ public class NfoFile {
 	public VideoInfoTag getVideoInfoTag() {
 		return videoInfoTag;
 	}
-
+	
 	/**
 	 * Loads the contents of the given .nfo file into the object (as a string)
 	 * 
@@ -280,7 +285,7 @@ public class NfoFile {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * @deprecated Use extractScraperUrl instead. Only exists to XBMC backwards
 	 *             compatibility.
