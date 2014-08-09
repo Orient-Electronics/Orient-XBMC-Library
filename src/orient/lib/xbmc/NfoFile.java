@@ -202,6 +202,10 @@ public class NfoFile {
 	public VideoInfoTag getDetails() {
 		return getDetails(null, false);
 	}
+	
+	public VideoInfoTag getDetails(VideoInfoTag details) {
+		return getDetails(details, false);
+	}
 
 	/**
 	 * Loads NFO XML data to add build a VideoInfoTag. If a VideoInfoTag, it

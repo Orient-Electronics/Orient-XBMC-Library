@@ -86,4 +86,23 @@ public class VideoInfoScannerTest {
 		
 		assertEquals("Thriller", infoTag.album);
 	}
+	
+	@Test
+	public void retrieveInfoForTvShow() {
+		
+		// TODO add more test cases
+		
+		String filePath = assetsPath + "Testing Data\\TV Shows\\Two And A Half Men\\S01E01.avi";
+		FileItem fileItem = new FileItem(filePath, false);
+		
+		Scraper scraper = new Scraper("metadata.tvdb.com");
+		
+		VideoInfoScanner scanner = new VideoInfoScanner();
+		scanner.retrieveInfoForTvShow(fileItem, false, scraper, true, false);
+		
+		fileItem = scanner.getLastProcessedFileItem();
+		VideoInfoTag infoTag = fileItem.getVideoInfoTag();
+		
+		assertEquals("Thriller", infoTag.album);
+	}
 }

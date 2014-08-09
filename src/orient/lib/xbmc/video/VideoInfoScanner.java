@@ -4,12 +4,15 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 
 import orient.lib.xbmc.CONTENT_TYPE;
 import orient.lib.xbmc.FileItem;
+import orient.lib.xbmc.FileItemList;
 import orient.lib.xbmc.NfoFile;
+import orient.lib.xbmc.Settings;
 import orient.lib.xbmc.NfoFile.NFOResult;
 import orient.lib.xbmc.addons.Scraper;
 import orient.lib.xbmc.addons.ScraperError;
@@ -19,6 +22,8 @@ import orient.lib.xbmc.utils.URIUtils;
 
 public class VideoInfoScanner {
 
+	private Set pathsToScan;
+	
 	/**
 	 * return values from the information lookup functions
 	 */
@@ -211,8 +216,6 @@ public class VideoInfoScanner {
 
 		return result;
 	}
-
-	
 	
 	public FileItem getLastProcessedFileItem() {
 		return lastProcessedFileItem;
@@ -565,6 +568,296 @@ public class VideoInfoScanner {
 	    return INFO_RET.INFO_NOT_FOUND;
 	}
 	
+	
+	public INFO_RET retrieveInfoForTvShow(FileItem item, boolean dirNames, Scraper scraper, boolean useLocal, boolean fetchEpisodes)
+	{
+		if(lastProcessedFileItem != null)
+			lastProcessedFileItem.reset();
+
+		lastProcessedFileItem = item;
+		
+
+		long idTvShow = -1;
+
+		//		TODO DB
+		//		if (pItem.isFolder()) {
+		//	      idTvShow = m_database.GetTvShowId(pItem->GetPath());
+		//		}
+		//	    else
+		//	    {
+		//	      String strPath = URIUtils.getDirectory(pItem.getPath());
+		//	      idTvShow = m_database.GetTvShowId(strPath);
+		//	    }
+
+
+		if (idTvShow > -1 && (fetchEpisodes || !item.isFolder()))
+		{
+			INFO_RET ret = retrieveInfoForEpisodes(item, idTvShow, scraper, useLocal);
+
+			//		TODO DB
+			//	      if (ret == INFO_RET.INFO_ADDED)
+			//	        m_database.SetPathHash(pItem->GetPath(), pItem->GetProperty("hash").asString());
+
+			return ret;
+		}
+
+
+		// handle .nfo files
+		NFOResult result = NFOResult.NO_NFO;
+
+		if (useLocal)
+			result = checkForNFOFile(item, dirNames, scraper);
+	    
+	    
+		if (result == NFOResult.FULL_NFO)
+		{
+			lastProcessedFileItem.getVideoInfoTag().reset();
+			lastProcessedFileItem.setFromVideoInfoTag(nfoReader.getVideoInfoTag());
+
+			// TODO DB
+			// long lResult = addVideo(item, scraper.content(), dirNames, useLocal);
+			//	      
+			//	      if (lResult < 0)
+			//	        return INFO_RET.INFO_ERROR;
+
+			if (fetchEpisodes)
+			{
+				// TODO DB
+				//	        INFO_RET ret = retrieveInfoForEpisodes(item, lResult, scraper, useLocal);
+
+				//	        if (ret == INFO_RET.INFO_ADDED)
+				//	          m_database.SetPathHash(pItem->GetPath(), pItem->GetProperty("hash").asString());
+
+				//	        return ret;
+			}
+			return INFO_RET.INFO_ADDED;
+		}
+
+
+		// Data fetch
+		ScraperUrl videoUrl = findVideo(lastProcessedFileItem.getMovieName(dirNames), scraper);
+
+		if (videoUrl == null)
+			return INFO_RET.INFO_NOT_FOUND;
+		
+		NfoFile nfoFile = (result == NFOResult.COMBINED_NFO) ? nfoReader : null;
+
+		lastProcessedFileItem = getDetails(lastProcessedFileItem, videoUrl, scraper, nfoFile);
+	    
+		if (lastProcessedFileItem.getVideoInfoTag() != null) {
+
+			// TODO DB
+//						long lResult=-1;
+			//			if ((lResult = AddVideo(item, scraper.content(), false, useLocal)) < 0)
+			//				return INFO_RET.INFO_ERROR;
+
+			return INFO_RET.INFO_ADDED;
+		}
+		
+		// TODO DB
+//	    if (fetchEpisodes)
+//	    {
+//	      INFO_RET ret = RetrieveInfoForEpisodes(item, lResult, scraper, useLocal);
+//	      
+//	      if (ret == INFO_RET.INFO_ADDED)
+//	        m_database.SetPathHash(pItem.getPath(), pItem->GetProperty("hash").asString());
+//	    }
+	
+		return INFO_RET.INFO_ADDED;
+	  }
+	
+	
+	public INFO_RET retrieveInfoForEpisodes(FileItem item, long showID, Scraper scraper, boolean useLocal)
+	  {
+	    // enumerate episodes
+	    ArrayList<Episode> files = null;
+	    
+	    if (!enumerateSeriesFolder(item, files))
+	      return INFO_RET.INFO_HAVE_ALREADY;
+	    
+	    if (files.isEmpty()) // no update or no files
+	      return INFO_RET.INFO_NOT_NEEDED;
+
+//	    if (m_bStop || (progress && progress->IsCanceled()))
+//	      return INFO_CANCELLED;
+
+	    VideoInfoTag showInfo = null;
+	    
+//	    TODO DB
+//	    m_database.GetTvShowInfo("", showInfo, showID);
+	    return onProcessSeriesFolder(files, scraper, useLocal, showInfo);
+	  }
+	
+	
+	private INFO_RET onProcessSeriesFolder(ArrayList<Episode> files,
+			Scraper scraper, boolean useLocal, VideoInfoTag showInfo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean enumerateSeriesFolder(FileItem item, ArrayList<Episode> episodeList)
+	{
+		return false;
+//		FileItemList items = new FileItemList();
+//
+//		Settings settings = Settings.getInstance();
+//	    ArrayList<String> regexps = settings.getTvshowExcludeFromScanRegExps();
+//
+//	    boolean bSkip = false;
+//
+//	    if (item.isFolder())
+//	    {
+//	      /*
+//	       * Note: DoScan() will not remove this path as it's not recursing for tvshows.
+//	       * Remove this path from the list we're processing in order to avoid hitting
+//	       * it twice in the main loop.
+//	       */
+//	      Set.iterator it = pathsToScan.find(item.getPath());
+//	      if (it != m_pathsToScan.end())
+//	        m_pathsToScan.erase(it);
+//
+//	      
+////	      Iterator<String> iterator = pathsToScan.iterator();
+////	      while(iterator.hasNext()) {
+////	          Integer setElement = iterator.next();
+////	          if(setElement==2) {
+////	              iterator.remove();
+////	          }
+////	      }
+//	      
+//	      String hash, dbHash;
+//	      hash = GetRecursiveFastHash(item->GetPath(), regexps);
+//	      if (m_database.GetPathHash(item->GetPath(), dbHash) && !hash.empty() && dbHash == hash)
+//	      {
+//	        // fast hashes match - no need to process anything
+//	        bSkip = true;
+//	      }
+//
+//	      // fast hash cannot be computed or we need to rescan. fetch the listing.
+//	      if (!bSkip)
+//	      {
+//	        int flags = DIR_FLAG_DEFAULTS;
+//	        if (!hash.empty())
+//	          flags |= DIR_FLAG_NO_FILE_INFO;
+//
+//	        Util.getRecursiveListing(item->GetPath(), items, g_advancedSettings.m_videoExtensions, flags);
+//
+//	        // fast hash failed - compute slow one
+//	        if (hash.empty())
+//	        {
+//	          GetPathHash(items, hash);
+//	          if (dbHash == hash)
+//	          {
+//	            // slow hashes match - no need to process anything
+//	            bSkip = true;
+//	          }
+//	        }
+//	      }
+//
+//	      if (bSkip)
+//	      {
+//	        CLog::Log(LOGDEBUG, "VideoInfoScanner: Skipping dir '%s' due to no change", CURL::GetRedacted(item->GetPath()).c_str());
+//	        // update our dialog with our progress
+//	        if (m_handle)
+//	          OnDirectoryScanned(item->GetPath());
+//	        return false;
+//	      }
+//
+//	      if (dbHash.empty())
+//	        CLog::Log(LOGDEBUG, "VideoInfoScanner: Scanning dir '%s' as not in the database", CURL::GetRedacted(item->GetPath()).c_str());
+//	      else
+//	        CLog::Log(LOGDEBUG, "VideoInfoScanner: Rescanning dir '%s' due to change (%s != %s)", CURL::GetRedacted(item->GetPath()).c_str(), dbHash.c_str(), hash.c_str());
+//
+//	      if (m_bClean)
+//	      {
+//	        m_pathsToClean.insert(m_database.GetPathId(item->GetPath()));
+//	        m_database.GetPathsForTvShow(m_database.GetTvShowId(item->GetPath()), m_pathsToClean);
+//	      }
+//	      item->SetProperty("hash", hash);
+//	    }
+//	    else
+//	    {
+//	      CFileItemPtr newItem(new CFileItem(*item));
+//	      items.Add(newItem);
+//	    }
+//
+//	    /*
+//	    stack down any dvd folders
+//	    need to sort using the full path since this is a collapsed recursive listing of all subdirs
+//	    video_ts.ifo files should sort at the top of a dvd folder in ascending order
+//
+//	    /foo/bar/video_ts.ifo
+//	    /foo/bar/vts_x_y.ifo
+//	    /foo/bar/vts_x_y.vob
+//	    */
+//
+//	    // since we're doing this now anyway, should other items be stacked?
+//	    items.Sort(SortByPath, SortOrderAscending);
+//	    int x = 0;
+//	    while (x < items.Size())
+//	    {
+//	      if (items[x]->m_bIsFolder)
+//	        continue;
+//
+//
+//	      CStdString strPathX, strFileX;
+//	      URIUtils::Split(items[x]->GetPath(), strPathX, strFileX);
+//	      //CLog::Log(LOGDEBUG,"%i:%s:%s", x, strPathX.c_str(), strFileX.c_str());
+//
+//	      int y = x + 1;
+//	      if (strFileX.Equals("VIDEO_TS.IFO"))
+//	      {
+//	        while (y < items.Size())
+//	        {
+//	          CStdString strPathY, strFileY;
+//	          URIUtils::Split(items[y]->GetPath(), strPathY, strFileY);
+//	          //CLog::Log(LOGDEBUG," %i:%s:%s", y, strPathY.c_str(), strFileY.c_str());
+//
+//	          if (strPathY.Equals(strPathX))
+//	            /*
+//	            remove everything sorted below the video_ts.ifo file in the same path.
+//	            understandbly this wont stack correctly if there are other files in the the dvd folder.
+//	            this should be unlikely and thus is being ignored for now but we can monitor the
+//	            where the path changes and potentially remove the items above the video_ts.ifo file.
+//	            */
+//	            items.Remove(y);
+//	          else
+//	            break;
+//	        }
+//	      }
+//	      x = y;
+//	    }
+//
+//	    // enumerate
+//	    for (int i=0;i<items.Size();++i)
+//	    {
+//	      if (items[i]->m_bIsFolder)
+//	        continue;
+//	      CStdString strPath = URIUtils::GetDirectory(items[i]->GetPath());
+//	      URIUtils::RemoveSlashAtEnd(strPath); // want no slash for the test that follows
+//
+//	      if (URIUtils::GetFileName(strPath).Equals("sample"))
+//	        continue;
+//
+//	      // Discard all exclude files defined by regExExcludes
+//	      if (CUtil::ExcludeFileOrFolder(items[i]->GetPath(), regexps))
+//	        continue;
+//
+//	      /*
+//	       * Check if the media source has already set the season and episode or original air date in
+//	       * the VideoInfoTag. If it has, do not try to parse any of them from the file path to avoid
+//	       * any false positive matches.
+//	       */
+//	      if (ProcessItemByVideoInfoTag(items[i].get(), episodeList))
+//	        continue;
+//
+////	      if (!EnumerateEpisodeItem(items[i].get(), episodeList))
+////	        CLog::Log(LOGDEBUG, "VideoInfoScanner: Could not enumerate file %s", CURL::GetRedacted(CURL::Decode(items[i]->GetPath())).c_str());
+//	    }
+//	    return true;
+	  }
+	
+
 	public void setLastProcessedFileItem(FileItem lastProcessedFileItem) {
 		this.lastProcessedFileItem = lastProcessedFileItem;
 	}
