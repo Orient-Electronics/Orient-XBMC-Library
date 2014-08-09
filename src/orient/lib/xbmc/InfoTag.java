@@ -1,23 +1,37 @@
-package orient.lib.xbmc.video;
+package orient.lib.xbmc;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.w3c.dom.Element;
 
+import orient.lib.xbmc.utils.XMLUtils;
+
 public abstract class InfoTag {
 
+	protected String XmlDateFormat = "yyyy-MM-dd";
+	
 	protected Map<String, String> xmlTagMapping = new HashMap<String, String>();
 
 	public InfoTag() {
 		super();
 	}
 	
+	/**
+	 * Called after XML parsing is complete.
+	 */
+	protected void afterParseXML() {
+		
+	}
+
 	/**
 	 * Returns the variable type of a given member of the class.
 	 * 
@@ -102,7 +116,7 @@ public abstract class InfoTag {
 			reset();
 
 		try {
-			parseNative(element, prioritise);
+			parseXML(element, prioritise);
 		} catch (IllegalAccessException | IllegalArgumentException
 				| NoSuchFieldException | NullPointerException | ParseException e) {
 			e.printStackTrace();
@@ -111,6 +125,112 @@ public abstract class InfoTag {
 		return true;
 	}
 
+	/**
+	 * Used by the parseXML method. Processes any incoming array items and adds
+	 * them to their respective arrays.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 * @return The processed value
+	 */
+	@SuppressWarnings("unchecked")
+	protected void onParseXMLArrayItem(String fieldName, Element valueEl) {
+		String genericType = getGenericTypeName(fieldName);
+
+		if (genericType.equals("String")) {
+
+			ArrayList<String> arr;
+			Field f;
+
+			try {
+				f = getClass().getDeclaredField(fieldName);
+				f.setAccessible(true);
+
+				if (f.get(this) == null) {
+					arr = new ArrayList<String>();
+				} else {
+					arr = (ArrayList<String>) f.get(this);
+				}
+
+				String item = XMLUtils.getFirstChildValue(valueEl);
+
+				arr.add((String) item);
+				getClass().getDeclaredField(fieldName).set(this, arr);
+
+			} catch (NoSuchFieldException | IllegalAccessException
+					| IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Used by the parseXML method. Performs any further pre-processing on the
+	 * incoming value if required.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 * @return The processed value
+	 * @throws ParseException 
+	 */
+	protected Date onParseXMLItemDate(Element el) throws ParseException {
+		String dateStr = XMLUtils.getFirstChildValue(el);
+
+		Date date = null;
+		
+		if (dateStr != null) {
+			date = new SimpleDateFormat(XmlDateFormat, Locale.ENGLISH).parse(dateStr);
+		}
+		
+		return date;
+	}
+
+	/**
+	 * Used by the parseXML method. Performs any further pre-processing on the
+	 * incoming value if required.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 * @return The processed value
+	 */
+	protected float onParseXMLItemFloat(Element el) {
+		return XMLUtils.getFirstChildValue_float(el);
+	}
+
+	/**
+	 * Used by the parseXML method. Performs any further pre-processing on the
+	 * incoming value if required.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 * @return The processed value
+	 */
+	protected int onParseXMLItemInt(Element el) {
+		return XMLUtils.getFirstChildValue_int(el);
+	}
+	
+	/**
+	 * Used by the parseXML method. Performs processing on any unrecognized 
+	 * types i.e. Any type other than String, int, float, date, ArrayList
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 */
+	protected void onParseXMLItemOther(Element el) {
+	}
+	
+	/**
+	 * Used by the parseXML method. Performs any further pre-processing on the
+	 * incoming value if required.
+	 * 
+	 * @param el
+	 *            The element to extract the value from
+	 * @return The processed value
+	 */
+	protected String onParseXMLItemString(Element el) {
+		return XMLUtils.getFirstChildValue(el);
+	}
+	
 	/**
 	 * Parse our native XML format for info. See Load for a description of the
 	 * available tag types.
@@ -125,13 +245,51 @@ public abstract class InfoTag {
 	 *             ParseException, NullPointerException
 	 * @see Load
 	 */
-	protected abstract void parseNative(Element element, boolean prioritise)
+	protected void parseXML(Element element, boolean prioritise)
 			throws IllegalAccessException, IllegalArgumentException,
-			NoSuchFieldException, ParseException, NullPointerException;
+			NoSuchFieldException, ParseException, NullPointerException {
 
-	public void reset() {
+		Element child = XMLUtils.getFirstChildElement(element);
 
+		while (child != null) {
+
+			String tag = child.getNodeName();
+
+			String memberName;
+			String fieldType;
+
+			if (xmlTagMapping.containsKey(tag)) {
+
+				memberName = xmlTagMapping.get(tag);
+				fieldType = getFieldType(memberName);
+
+				if (fieldType.equals("String")) {
+					setField(memberName, onParseXMLItemString(child));
+					
+				} else if (fieldType.equals("int")) {
+					setField(memberName, onParseXMLItemInt(child));
+					
+				} else if (fieldType.equals("float")) {
+					setField(memberName, onParseXMLItemFloat(child));
+					
+				} else if (fieldType.equals("Date")) {
+					setField(memberName, onParseXMLItemDate(child));
+					
+				} else if (fieldType.equals("ArrayList")) {
+					onParseXMLArrayItem(memberName, child);
+				} else {
+					onParseXMLItemOther(child);
+				}
+			}
+
+			child = XMLUtils.getNextSiblingElement(child);
+		}
+
+		// Post Processing
+		afterParseXML();
 	}
+
+	public abstract void reset();
 
 	/**
 	 * Dynamically set a member of this class.
