@@ -31,7 +31,7 @@ public class ScraperUrlGet {
 	}
 
 	
-	public String Get() {
+	public String get() {
 
 		enableHttpResponseCache();
 		
@@ -50,20 +50,20 @@ public class ScraperUrlGet {
 		InputStream is = null;
 	        
 	    try {
-	        URL url = new URL(scrURL.m_url);
+	        URL url = new URL(scrURL.url);
 	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        
-	        if (scrURL.m_post)
+	        if (scrURL.isPost)
 	        	conn.setRequestMethod("POST");
 	        else
 	        	conn.setRequestMethod("GET");
 	        
-	        if (scrURL.m_spoof != null)
-	        	conn.addRequestProperty("Referer", scrURL.m_spoof);
+	        if (scrURL.spoof != null)
+	        	conn.addRequestProperty("Referer", scrURL.spoof);
 	        
-	        if (scrURL.m_isgz)
+	        if (scrURL.isGZip)
 	        	conn.addRequestProperty("Accept-Encoding", "gzip");
 	        
 	        conn.setDoInput(true);
@@ -75,7 +75,7 @@ public class ScraperUrlGet {
 	        is = conn.getInputStream();
 
 	        // Convert the InputStream into a string
-	        String contentAsString = ProcessHttpResponse(is, conn.getContentEncoding());
+	        String contentAsString = processHttpResponse(is, conn.getContentEncoding());
 	        return contentAsString;
 	        
 		} finally {
@@ -87,7 +87,7 @@ public class ScraperUrlGet {
 	    }
 	}
 	
-	private String ProcessHttpResponse(InputStream instream, String contentEncoding)
+	private String processHttpResponse(InputStream instream, String contentEncoding)
 			throws IllegalStateException, IOException {
 
 		String responseStr;

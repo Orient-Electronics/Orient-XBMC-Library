@@ -1,14 +1,24 @@
 package orient.lib.xbmc.utils;
 
 public class UrlEntry {
-	public String m_spoof = null;
-	public String m_url = null;
-	public String m_cache = null;
-	public String m_aspect = null;
-	public URL_TYPE m_type = URL_TYPE.GENERAL;
-	public boolean m_post = false;
-	public boolean m_isgz = false;
-	public int m_season = -1;
+	public String aspect;
+	public String cache;
+	public String spoof;
+
+	/**
+	 * Represents a thumbnail or icon of this entry. This doesn't exist in XBMC
+	 * and is a custom implementation.
+	 */
+	public String thumb;
+	public String url;
+	public boolean isPost;
+	public boolean isGZip;
+	public int season;
+	public URL_TYPE type;
+
+	public UrlEntry() {
+		reset();
+	}
 
 	@Override
 	public boolean equals(Object other) {
@@ -18,24 +28,39 @@ public class UrlEntry {
 
 		UrlEntry that = (UrlEntry) other;
 
-		if ((this.m_spoof == null || that.m_spoof == null)
-				&& (this.m_spoof != that.m_spoof))
+		if ((this.spoof == null || that.spoof == null)
+				&& (this.spoof != that.spoof))
 			return false;
 
-		if ((this.m_url == null || that.m_url == null)
-				&& (this.m_url != that.m_url))
+		if ((this.url == null || that.url == null) && (this.url != that.url))
 			return false;
 
-		if ((this.m_cache == null || that.m_cache == null)
-				&& (this.m_cache != that.m_cache))
+		if ((this.cache == null || that.cache == null)
+				&& (this.cache != that.cache))
 			return false;
 
-		if ((this.m_aspect == null || that.m_aspect == null)
-				&& (this.m_aspect != that.m_aspect))
+		if ((this.aspect == null || that.aspect == null)
+				&& (this.aspect != that.aspect))
+			return false;
+
+		if ((this.thumb == null || that.thumb == null)
+				&& (this.thumb != that.thumb))
 			return false;
 
 		// Custom equality check here.
-		return this.m_type == that.m_type && this.m_post == that.m_post
-				&& this.m_isgz == that.m_isgz && this.m_season == that.m_season;
+		return this.type == that.type && this.isPost == that.isPost
+				&& this.isGZip == that.isGZip && this.season == that.season;
+	}
+
+	public void reset() {
+		aspect = null;
+		cache = null;
+		spoof = null;
+		thumb = null;
+		url = null;
+		isPost = false;
+		isGZip = false;
+		season = -1;
+		type = URL_TYPE.GENERAL;
 	}
 };
