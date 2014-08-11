@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,7 +30,13 @@ public class ScraperUrl {
 	public double relevance;
 	
 	public ArrayList<UrlEntry> urlList;
-
+	
+	/**
+	 * Contains any extra data.
+	 * Custom implementation, doesn't exist in XBMC.
+	 */
+	public Map<String, String> extras;
+	
 	/**
 	 * This method from xbmc has been broken up into multiple methods: Get,
 	 * ExecuteHttpRequest, ProcessHttpResponse and SaveCache.
@@ -44,11 +52,13 @@ public class ScraperUrl {
 
 	public ScraperUrl() {
 		urlList = new ArrayList<UrlEntry>();
+		extras = new HashMap<String, String>();
 		relevance = 0;
 	}
 
 	public ScraperUrl(String strUrl) {
 		urlList = new ArrayList<UrlEntry>();
+		extras = new HashMap<String, String>();
 		relevance = 0;
 
 		parseString(strUrl);
@@ -61,6 +71,7 @@ public class ScraperUrl {
 		xml = null;
 		relevance = 0;
 		urlList.clear();
+		extras.clear();
 	}
 
 	public UrlEntry getFirstThumb(String type) {

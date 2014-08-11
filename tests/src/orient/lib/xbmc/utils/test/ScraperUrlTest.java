@@ -26,7 +26,7 @@ public class ScraperUrlTest {
 				+ "  </someurl>\n" + "  <someotherurl>\n"
 				+ "  </someotherurl>\n" + "</data>\n";
 
-		parseResult = url.ParseString(xmlstring);
+		parseResult = url.parseString(xmlstring);
 	}
 
 	@Test
@@ -37,16 +37,16 @@ public class ScraperUrlTest {
 	@Test
 	public void parseStringResults() {
 		UrlEntry url = new UrlEntry();
-		url.m_spoof = "blah";
-		url.m_url = "someurl";
-		url.m_cache = null;
-		url.m_aspect = null;
-		url.m_type = URL_TYPE.GENERAL;
-		url.m_post = false;
-		url.m_isgz = true;
-		url.m_season = -1;
+		url.spoof = "blah";
+		url.url = "someurl";
+		url.cache = null;
+		url.aspect = null;
+		url.type = URL_TYPE.GENERAL;
+		url.isPost = false;
+		url.isGZip = true;
+		url.season = -1;
 		
-		boolean equal = this.url.GetFirstThumb(null).equals(url);
+		boolean equal = this.url.getFirstThumb(null).equals(url);
 		
 		assertEquals(true, equal);
 	}

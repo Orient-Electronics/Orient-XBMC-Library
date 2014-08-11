@@ -270,14 +270,14 @@ public class VideoInfoTag extends InfoTag {
 			if (pictureUrl == null)
 				pictureUrl = new ScraperUrl();
 
-			pictureUrl.ParseElement(el);
+			pictureUrl.parseElement(el);
 		}
 		if (tag == "fanart") {
 
 			if (fanartUrl == null)
 				fanartUrl = new ScraperUrl();
 
-			fanartUrl.ParseElement(el);
+			fanartUrl.parseElement(el);
 		} else if (tag == "fileinfo") {
 			Element streamEl = XMLUtils.getFirstChildElement(el,
 					"streamdetails");

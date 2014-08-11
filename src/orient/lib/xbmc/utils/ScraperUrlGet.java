@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -46,11 +47,13 @@ public class ScraperUrlGet {
 		return result;
 	}
 	 
-	private String run(UrlEntry scrURL) throws IOException{
+	private String run(UrlEntry scrURL) throws IOException {
 		InputStream is = null;
 	        
 	    try {
-	        URL url = new URL(scrURL.url);
+	    	String urlStr = scrURL.url.replace(" ", "%20");
+	    	
+	        URL url = new URL(urlStr);
 	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);

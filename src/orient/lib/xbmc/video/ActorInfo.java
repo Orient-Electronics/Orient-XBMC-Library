@@ -43,7 +43,7 @@ public class ActorInfo {
 			if (thumbUrl == null)
 				thumbUrl = new ScraperUrl();
 			
-			thumbUrl.ParseElement(thumb);
+			thumbUrl.parseElement(thumb);
 			
 			thumb = XMLUtils.getNextSiblingElement(actor, "thumb");
 		}

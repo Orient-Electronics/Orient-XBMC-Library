@@ -515,6 +515,8 @@ public class ScraperParser {
 				dest = "";
 				bAppend = true;
 			}
+			else if (dest == null)
+				dest = "";
 
 			String strCurOutput = strOutput;
 
@@ -679,7 +681,7 @@ public class ScraperParser {
 	private String replaceBuffers(String strDest) {
 
 		// insert buffers
-		for (int i = MAX_SCRAPER_BUFFERS - 1; i >= 0; i--) {
+		for (int i = 0; i < MAX_SCRAPER_BUFFERS; i++) {
 
 			// create strings like $$1, $$2
 			// String oldStr = String.format("$$%1$s", i + 1);

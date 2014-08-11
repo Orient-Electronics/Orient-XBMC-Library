@@ -4,9 +4,15 @@ import static junitparams.JUnitParamsRunner.$;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -26,11 +32,11 @@ public class ScraperTest {
 
 	private Settings settings;
 	
-	private String assetsPath;
+	private String testAssetsPath;
 	
 	public ScraperTest() {
 		settings = Settings.getInstance();
-		assetsPath = settings.getTestAssetsDirPath();
+		testAssetsPath = settings.getTestAssetsDirPath();
 	}
 
 	@Before
@@ -55,27 +61,40 @@ public class ScraperTest {
 	
 	@Test
 	@Parameters({
+		"metadata.themoviedb.org, 82992, Fast & Furious 6 (2013)",
 		"metadata.themoviedb.org, 187339, Mission Impossible 720p BRRip [Dual Audio] [English + Hindi] x264 BUZZccd [WBRG].mkv",
 		"metadata.themoviedb.org, 56292, Mission Impossible Ghost Protocol [2011] 720p BRRip [Dual Audio] [English + Hindi] x264 BUZZccd [WBRG].mkv",
 	})
-	public void findMvoie(String scraperId, String movieIdResult, String filename) {
+	public void findMovie(String scraperId, String movieIdResult, String filename) {
 		Scraper scraper = new Scraper(scraperId);
 		ArrayList<ScraperUrl> movieResults;
 		
 		try {
 			movieResults = scraper.findMovie(filename, true);
-			assertEquals(movieResults.get(0).strId , movieIdResult);
+			assertEquals(movieResults.get(0).id , movieIdResult);
 		} catch (ScraperError e) {
 			e.printStackTrace();
 			fail();
 		}
 		
 	}
+	
+	@Test
+	@Parameters({
+		"metadata.epg.indian-television-guide, Star Movies, star-movies",
+		"metadata.epg.tv.burrp.com, Star Movies, 59",
+	})
+	public void findEpg(String scraperId, String channel, String expectedChannelId) throws ScraperError {
+		Scraper scraper = new Scraper(scraperId);
+		ArrayList<ScraperUrl> movieResults = scraper.findEpgChannel(channel, null);
+		
+		assertEquals(expectedChannelId, movieResults.get(0).id);
+	}
 
 	@SuppressWarnings("unused")
 	private Object[] nfoData() {
 		return $(
-				$( "metadata.themoviedb.org", "44214", "http://api.tmdb.org/3/movie/44214?api_key=57983e31fb435df4df77afb854740ea9&amp;language=en", assetsPath + "Testing Data\\Movies - Flat\\Black Swan (2010) [720p] [R] [voted 0.0] [Thriller].nfo" )
+				$( "metadata.themoviedb.org", "44214", "http://api.tmdb.org/3/movie/44214?api_key=57983e31fb435df4df77afb854740ea9&amp;language=en", testAssetsPath + "Testing Data\\Movies - Flat\\Black Swan (2010) [720p] [R] [voted 0.0] [Thriller].nfo" )
 				);
 	}
 	
@@ -83,7 +102,6 @@ public class ScraperTest {
 	@Test
 	@Parameters(method = "nfoData")
 	public void nfoUrl(String scraperId, String idResult, String url, String filePath) {
-		
 		NfoFile nfoFile = new NfoFile();
 		
 		nfoFile.load(filePath);
@@ -100,7 +118,7 @@ public class ScraperTest {
 			
 			boolean result = false;
 			
-			if (scraperUrl.strId.equals(idResult))
+			if (scraperUrl.id.equals(idResult))
 				result = true;
 			
 			assertEquals(true, result);

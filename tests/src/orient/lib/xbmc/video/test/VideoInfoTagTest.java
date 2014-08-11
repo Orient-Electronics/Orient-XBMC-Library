@@ -23,7 +23,7 @@ public class VideoInfoTagTest extends TestCase {
 		
 		Document doc = XMLUtils.getDocument(path + "\\" + fileName);
 		
-		assertTrue(video.load(doc.getDocumentElement(), true, false));
+		assertTrue(video.loadXML(doc.getDocumentElement(), true, false));
 	}
 	
 	public void testLoadShow() {
@@ -33,7 +33,7 @@ public class VideoInfoTagTest extends TestCase {
 		
 		Document doc = XMLUtils.getDocument(path + "\\" + fileName);
 		
-		assertTrue(video.load(doc.getDocumentElement(), true, false));
+		assertTrue(video.loadXML(doc.getDocumentElement(), true, false));
 	}
 
 }

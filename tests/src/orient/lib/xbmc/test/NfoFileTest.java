@@ -33,7 +33,7 @@ public class NfoFileTest {
 		NfoFile nfo = new NfoFile();
 		nfo.create(nfoPath, scraper);
 		
-		assertEquals(nfo.getScraperUrl().strId, "tt1440129");
+		assertEquals(nfo.getScraperUrl().id, "tt1440129");
 	}
 
 }

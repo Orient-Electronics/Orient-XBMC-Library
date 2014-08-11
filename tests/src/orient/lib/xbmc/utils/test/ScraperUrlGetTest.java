@@ -22,12 +22,12 @@ public class ScraperUrlGetTest extends TestCase {
 		url = new ScraperUrl();
 		UrlEntry entry = new UrlEntry();
 		
-		entry.m_url = "http://api.tmdb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&query=Mission%20Impossible%20Ghost%20Protocol&year=2011&language=en";
-		entry.m_cache = "cachfile";
-		url.m_url.add(entry);
+		entry.url = "http://api.tmdb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&query=Mission%20Impossible%20Ghost%20Protocol&year=2011&language=en";
+		entry.cache = "cachfile";
+		url.urlList.add(entry);
 
 		urlGetter = new ScraperUrlGet(entry, "cacheContext");
-		getResult = urlGetter.Get();
+		getResult = urlGetter.get();
 	}
 
 	public void testFoo() {

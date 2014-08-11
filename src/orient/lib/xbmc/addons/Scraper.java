@@ -3,10 +3,12 @@ package orient.lib.xbmc.addons;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,36 +46,6 @@ public class Scraper extends Addon {
 	    }
 	}
 	
-	boolean m_fLoaded;
-	String m_language;
-
-	boolean m_requiressettings;
-
-	// CDateTimeSpan m_persistence;
-	CONTENT_TYPE m_pathContent;
-
-	ScraperParser m_parser;
-
-	public Scraper(){
-		super();
-		
-		m_parser = new ScraperParser();
-		m_parser.setScraper(this);
-	}
-
-	// public static ContentMapping content[] = []
-
-	public Scraper(AddonProps props) {
-		super(props);
-		init();
-	}
-
-	public Scraper(String id){
-		super(id);
-		init();
-	}
-	
-	
 	/**
 	 * if the XML root is <error>, throw CScraperError with enclosed
 	 * <title>/<message> values
@@ -96,14 +68,70 @@ public class Scraper extends Addon {
 	  
 	  throw new ScraperError(sTitle, sMessage);
 	}
+	boolean loaded;
+
+	String language;
+
+	boolean requiresSettings;
+
+	// CDateTimeSpan m_persistence;
+	CONTENT_TYPE pathContent;
+
+	ScraperParser parser;
+
+	// public static ContentMapping content[] = []
+
+	public Scraper(){
+		super();
+		
+		parser = new ScraperParser();
+		parser.setScraper(this);
+	}
+
+	public Scraper(AddonProps props) {
+		super(props);
+		init();
+	}
+	
+	
+	public Scraper(String id){
+		super(id);
+		init();
+	}
 
 	public CONTENT_TYPE content() {
-		return m_pathContent;
+		return pathContent;
 	};
+
+	public ArrayList<ScraperUrl> find(String... params) throws ScraperError {
+		
+		if (isNoop())
+			throw new ScraperError();
+
+		// request a search URL from the title/filename/etc.
+		ArrayList<String> searchResults = run("CreateSearchUrl", null, params);
+
+		if (searchResults.isEmpty())
+		{
+			//		    CLog::Log(LOGDEBUG, "%s: CreateSearchUrl failed", __FUNCTION__);
+			throw new ScraperError();
+		}
+
+		// do the search, and parse the result into a list
+		ScraperUrl scraperUrl = new ScraperUrl();
+		scraperUrl.parseString(searchResults.get(0));
+		
+		searchResults = run("GetSearchResults", scraperUrl, scraperUrl.urlList.get(0).url);
+
+		if (searchResults == null)
+			throw new ScraperError();
+		
+		return parseSearchResults(searchResults);
+	}
 
 	// find album by artist, using fcurl for web fetches
 	// returns a list of albums (empty if no match or failure)
-	public void FindAlbum(String sAlbum, String sArtist) throws ScraperError
+	public void findAlbum(String sAlbum, String sArtist) throws ScraperError
 	{
 //		std::vector<CMusicAlbumInfo> vcali;
 //		  if (IsNoop())
@@ -127,7 +155,7 @@ public class Scraper extends Addon {
 		if (vcsOut.isEmpty() || vcsOut.get(0).length() == 0)
 			return;
 
-		scurl.ParseString(vcsOut.get(0));
+		scurl.parseString(vcsOut.get(0));
 
 
 		// the next function is passed the contents of the returned URL, and returns
@@ -142,7 +170,7 @@ public class Scraper extends Addon {
 		//  </entity>
 		//  ...
 		// </results>
-		vcsOut = run("GetAlbumSearchResults", scurl, null);
+		vcsOut = run("GetAlbumSearchResults", scurl);
 		
 		for (String i : vcsOut) {
 			Document doc = XMLUtils.getDocumentFromString(i);
@@ -194,15 +222,15 @@ public class Scraper extends Addon {
 
 				ScraperUrl sUrlAlbum = new ScraperUrl();
 				if (pxeLink == null) 
-					sUrlAlbum.ParseString(scurl.m_xml);
+					sUrlAlbum.parseString(scurl.xml);
 
 
 				for (; pxeLink != null && pxeLink.getFirstChild() != null; pxeLink = XMLUtils
 						.getNextSiblingElement(pxeLink, "url"))
-					sUrlAlbum.ParseElement(pxeLink);
+					sUrlAlbum.parseElement(pxeLink);
 				
 				
-				if (sUrlAlbum.m_url.isEmpty())
+				if (sUrlAlbum.urlList.isEmpty())
 					continue;
 				
 //				CMusicAlbumInfo ali(sTitle, sArtist, sAlbumName, scurlAlbum);
@@ -224,6 +252,35 @@ public class Scraper extends Addon {
 //		return vcali;
 	}
 
+	
+	public ArrayList<ScraperUrl> findEpgChannel(String channel, String date) throws ScraperError {
+		
+		ArrayList<ScraperUrl> searhResults = find(channel, date);
+		
+		////////////////////////
+		// Relevance Calculation
+		////////////////////////
+		
+		for (ScraperUrl searhResult : searhResults) {
+			
+			// calculate the relevance of this hit
+			String sCompareTitle = StringUtils.lowerCase(searhResult.title);
+			String sMatchTitle = StringUtils.lowerCase(channel);
+			
+			/*
+			 * Identify the best match by performing a fuzzy string compare on the search term and
+			 * the result. Additionally, use the year (if available) to further refine the best match.
+			 * An exact match scores 1, a match off by a year scores 0.5 (release dates can vary between
+			 * countries), otherwise it scores 0.
+			 */
+			searhResult.relevance = CppUtils.fstrcmp(sMatchTitle, sCompareTitle, 0.0);
+		}
+		
+		Collections.sort(searhResults, new RelevanceSortComparator());
+		
+		return searhResults;
+	}
+	
 	public ArrayList<ScraperUrl> findMovie(String movie, boolean cleanChars)
 			throws ScraperError {
 
@@ -233,176 +290,59 @@ public class Scraper extends Addon {
 		String sYear = result.get("year");
 //		String sTitleYear = result.get("titleAndYear");
 
-		ArrayList<ScraperUrl> vcscurl = new ArrayList<ScraperUrl>();
-
-		//		if (IsNoop())
-		//			return vcscurl;
-
 		if (!cleanChars)
 			sTitle.replace('-',' ');
 
-		ArrayList<String> vcsIn = new ArrayList<String>();
-		//		  g_charsetConverter.utf8To(SearchStringEncoding(), sTitle, vcsIn[0]);
-
-
-		try {
-			vcsIn.add(URLEncoder.encode(sTitle, "UTF-8").replace("+", "%20"));
-		} catch (UnsupportedEncodingException e) {
-			vcsIn.add(sTitle);
-		}
-
-		if (sYear != null && sYear.length() != 0)
-			vcsIn.add(sYear);
-
-
-		// request a search URL from the title/filename/etc.
-		ScraperUrl scurl = new ScraperUrl();
-		ArrayList<String> vcsOut = run("CreateSearchUrl", scurl, vcsIn);
-
-		if (vcsOut.isEmpty())
-		{
-			//		    CLog::Log(LOGDEBUG, "%s: CreateSearchUrl failed", __FUNCTION__);
-					    throw new ScraperError();
-		}
-
-
-		scurl.ParseString(vcsOut.get(0));
-		//		  scurl.ParseString("<url>http://api.tmdb.org/3/search/movie?api_key=57983e31fb435df4df77afb854740ea9&amp;query=Mission%20Impossible%20Ghost%20Protocol&amp;year=2011&amp;language=en</url>");
-
-
-		// do the search, and parse the result into a list
-		vcsIn.clear();
-		vcsIn.add(scurl.m_url.get(0).m_url);
-		vcsOut = run("GetSearchResults", scurl, vcsIn);
-
-		if (vcsOut == null)
-			return null;
+		ArrayList<ScraperUrl> searhResults = find(sTitle, sYear);
 		
-		boolean fSort = true;
-		boolean fResults = false;
-		ArrayList<String> stsDupeCheck = new ArrayList<String>();
-
-		for (String i : vcsOut) {
-			Document doc = XMLUtils.getDocumentFromString(i);
-
-			if (doc.getDocumentElement() == null) {
-				continue;  // might have more valid results later
-			}
-
-			checkScraperError(doc.getDocumentElement());
-
-			NodeList resultsList = doc.getElementsByTagName("results");
-
-			if (resultsList.getLength() < 1)
-				continue;
-
-			Element xhResults = (Element) resultsList.item(0);
-
-			fResults = true;  // even if empty
-
-			// we need to sort if returned results don't specify 'sorted="yes"'
-			if (fSort)
-			{
-				String sorted = XMLUtils.getAttribute(xhResults, "sorted");
-				if (sorted != null)
-					fSort = !sorted.equalsIgnoreCase("yes");
-			}
-
-			for (Element pxeMovie = XMLUtils.getFirstChildElement(xhResults, "entity"); 
-					pxeMovie != null; 
-					pxeMovie = XMLUtils.getNextSiblingElement(pxeMovie, "entity")) {
-
-
-				ScraperUrl scurlMovie = new ScraperUrl();
-
-				// ID
-				Element pxnId = XMLUtils.getFirstChildElement(pxeMovie, "id");
-
-				if (pxnId != null && pxnId.getFirstChild() != null)
-					scurlMovie.strId = pxnId.getFirstChild().getNodeValue();
-				
-				Element pxnTitle = XMLUtils.getFirstChildElement(pxeMovie, "title");
-
-				// Title
-				if (pxnTitle == null || pxnTitle.getFirstChild() == null)
-					continue;
-
-				scurlMovie.strTitle = pxnTitle.getFirstChild().getNodeValue();
-
-				// Link
-				Element pxeLink = XMLUtils.getFirstChildElement(pxeMovie, "url");
-
-				if (pxeLink == null || pxeLink.getFirstChild() == null) 
-					continue;
-
-
-				for (; pxeLink != null && pxeLink.getFirstChild() != null; pxeLink = XMLUtils
-						.getNextSiblingElement(pxeLink, "url"))
-
-					scurlMovie.ParseElement(pxeLink);
-
-
-				// calculate the relevance of this hit
-				String sCompareTitle = StringUtils.lowerCase(scurlMovie.strTitle);
-				String sMatchTitle = StringUtils.lowerCase(sTitle);
-				
-				
-				/*
-				 * Identify the best match by performing a fuzzy string compare on the search term and
-				 * the result. Additionally, use the year (if available) to further refine the best match.
-				 * An exact match scores 1, a match off by a year scores 0.5 (release dates can vary between
-				 * countries), otherwise it scores 0.
-				 */
-				Element pxnYear = XMLUtils.getFirstChildElement(pxeMovie, "year");
-
-				String sCompareYear = "";
-				double yearScore = 0;
-
-				if (pxnYear != null && pxnYear.getFirstChild() != null) {
-					sCompareYear = pxnYear.getFirstChild().getNodeValue();
-
-					if (sYear.length() != 0 && sCompareYear.length() != 0)
-						yearScore = Math.max(0.0, 1-0.5* Math.abs(Integer.parseInt(sYear)-Integer.parseInt(sCompareYear)));
-
-				}
-				
-				scurlMovie.relevance = CppUtils.fstrcmp(sMatchTitle, sCompareTitle, 0.0) + yearScore;
-
-
-				// reconstruct a title for the user
-
-				if (sCompareYear.length() != 0)
-					scurlMovie.strTitle = String.format("%s (%s)",
-							scurlMovie.strTitle, sCompareYear);
-
-
-				if (!stsDupeCheck.contains(scurlMovie.m_url.get(0).m_url + " " + scurlMovie.strTitle)) {
-					stsDupeCheck.add(scurlMovie.m_url.get(0).m_url + " " + scurlMovie.strTitle);
-					vcscurl.add(scurlMovie);
-				}	
-			}
-
-		}
-
-		if (!fResults)
-			throw new ScraperError();
-
-		Collections.sort(vcscurl, new RelevanceSortComparator());
+		////////////////////////
+		// Relevance Calculation
+		////////////////////////
 		
-		return vcscurl;
+		for (ScraperUrl searhResult : searhResults) {
+			
+			// calculate the relevance of this hit
+			String sCompareTitle = StringUtils.lowerCase(searhResult.title);
+			String sMatchTitle = StringUtils.lowerCase(sTitle);
+			
+			/*
+			 * Identify the best match by performing a fuzzy string compare on the search term and
+			 * the result. Additionally, use the year (if available) to further refine the best match.
+			 * An exact match scores 1, a match off by a year scores 0.5 (release dates can vary between
+			 * countries), otherwise it scores 0.
+			 */
+			String sCompareYear = searhResult.extras.get("year");
+			double yearScore = 0;
+			
+			if (!sYear.isEmpty() && !sCompareYear.isEmpty())
+				yearScore = Math.max(0.0, 1-0.5* Math.abs(Integer.parseInt(sYear)-Integer.parseInt(sCompareYear)));
+			
+			
+			searhResult.relevance = CppUtils.fstrcmp(sMatchTitle, sCompareTitle, 0.0) + yearScore;
+
+
+			// reconstruct a title for the user
+			if (sCompareYear.length() != 0)
+				searhResult.title = String.format("%s (%s)",
+						searhResult.title, sCompareYear);
+		}
+		
+		Collections.sort(searhResults, new RelevanceSortComparator());
+		
+		return searhResults;
 	}
-
+	
 	// fetch list of episodes from URL (from video database)
 	public ArrayList<Episode> getEpisodeList(ScraperUrl scurl) throws ScraperError
 	{
 		ArrayList<Episode> vcep = new ArrayList<Episode>();
 		
-	  if (scurl == null || scurl.m_url.isEmpty())
+	  if (scurl == null || scurl.urlList.isEmpty())
 	    return vcep;
 
 
 	  ArrayList<String> vcsIn = new ArrayList<String>();
-	  vcsIn.add(scurl.m_url.get(0).m_url);
+	  vcsIn.add(scurl.urlList.get(0).url);
 	  
 	  ArrayList<String> vcsOut = run("GetEpisodeList", scurl, vcsIn);
 
@@ -447,11 +387,11 @@ public class Scraper extends Addon {
 //	        if (XMLHelper.getFirstChildValue(titleEl) == null || scurlEp.strTitle.isEmpty() )
 //	            scurlEp.strTitle = g_localizeStrings.Get(416);
 	        
-	        scurlEp.strId = XMLUtils.getFirstChildValue(pxeMovie, "id");
+	        scurlEp.id = XMLUtils.getFirstChildValue(pxeMovie, "id");
 
 	        for ( ; pxeLink != null && XMLUtils.getFirstChildElement(pxeLink) != null; 
 	        		pxeLink = XMLUtils.getNextSiblingElement(pxeLink, "url"))
-	          scurlEp.ParseElement(pxeLink);
+	          scurlEp.parseElement(pxeLink);
 
 	        // date must be the format of yyyy-mm-dd
 //	        ep.date.SetValid(FALSE);
@@ -525,13 +465,13 @@ public class Scraper extends Addon {
 			scurlRet = new ScraperUrl();
 
 			if (pId != null && pId.getFirstChild() != null)
-				scurlRet.strId = pId.getFirstChild().getNodeValue();
+				scurlRet.id = pId.getFirstChild().getNodeValue();
 
 			if (pxeUrl != null && XMLUtils.getAttribute(pxeUrl, "function") != null)
 				continue;
 
 			if (pxeUrl != null)
-				scurlRet.ParseElement(pxeUrl);
+				scurlRet.parseElement(pxeUrl);
 			else
 				continue;
 
@@ -556,8 +496,8 @@ public class Scraper extends Addon {
 		String sFunc = fMovie ? "GetDetails" : "GetEpisodeDetails";
 		
 		ArrayList<String> vcsIn = new ArrayList<String>();
-		vcsIn.add(scurl.strId);
-		vcsIn.add(scurl.m_url.get(0).m_url);
+		vcsIn.add(scurl.id);
+		vcsIn.add(scurl.urlList.get(0).url);
 		
 		ArrayList<String> vcsOut = run(sFunc, scurl, vcsIn);
 		
@@ -579,7 +519,7 @@ public class Scraper extends Addon {
 
 			Element pxeDetails = (Element) resultsList.item(0);
 			
-			video.load(pxeDetails, true/*fChain*/, true);
+			video.loadXML(pxeDetails, true/*fChain*/, true);
 		}
 		
 		return video;
@@ -587,30 +527,30 @@ public class Scraper extends Addon {
 
 
 	private void init() {
-		m_parser = new ScraperParser();
-		m_parser.setScraper(this);
+		parser = new ScraperParser();
+		parser.setScraper(this);
 
 		if (getType() == null)
 			return;
 		
 		switch (getType()) {
 		case ADDON_SCRAPER_ALBUMS:
-			m_pathContent = CONTENT_TYPE.CONTENT_ALBUMS;
+			pathContent = CONTENT_TYPE.CONTENT_ALBUMS;
 			break;
 		case ADDON_SCRAPER_ARTISTS:
-			m_pathContent = CONTENT_TYPE.CONTENT_ARTISTS;
+			pathContent = CONTENT_TYPE.CONTENT_ARTISTS;
 			break;
 		case ADDON_SCRAPER_MOVIES:
-			m_pathContent = CONTENT_TYPE.CONTENT_MOVIES;
+			pathContent = CONTENT_TYPE.CONTENT_MOVIES;
 			break;
 		case ADDON_SCRAPER_MUSICVIDEOS:
-			m_pathContent = CONTENT_TYPE.CONTENT_MUSICVIDEOS;
+			pathContent = CONTENT_TYPE.CONTENT_MUSICVIDEOS;
 			break;
 		case ADDON_SCRAPER_TVSHOWS:
-			m_pathContent = CONTENT_TYPE.CONTENT_TVSHOWS;
+			pathContent = CONTENT_TYPE.CONTENT_TVSHOWS;
 			break;
 		default:
-			m_pathContent = CONTENT_TYPE.CONTENT_NONE;
+			pathContent = CONTENT_TYPE.CONTENT_NONE;
 			break;
 		}
 	}
@@ -625,26 +565,26 @@ public class Scraper extends Addon {
 	 * @param extras Params
 	 * @return
 	 */
-	public String internalRun(String function, ScraperUrl scrURL, ArrayList<String> extras) {
+	private String internalRun(String function, ScraperUrl scrURL, ArrayList<String> extras) {
 
 		// walk the list of input URLs and fetch each into parser parameters
 		int i;
-		for (i=0;i<scrURL.m_url.size();++i)
+		for (i = 0; scrURL != null && i<scrURL.urlList.size(); ++i)
 		{
-			m_parser.params[i] = ScraperUrl.Get(scrURL.m_url.get(i),getId());
+			parser.params[i] = ScraperUrl.get(scrURL.urlList.get(i),getId());
 
-			if (m_parser.params[i] == null || m_parser.params[i].length() == 0)
+			if (parser.params[i] == null || parser.params[i].length() == 0)
 				return "";
 		}
 
 		// put the 'extra' parameters into the parser parameter list too
-		if (!extras.isEmpty())
+		if (extras!= null && !extras.isEmpty())
 		{
 			for (int j=0;j<extras.size();++j)
-				m_parser.params[j+i] = extras.get(j);
+				parser.params[j+i] = extras.get(j);
 		}
 
-		return m_parser.parse(function,this);
+		return parser.parse(function,this);
 	}
 
 	public boolean isNoop() {
@@ -654,10 +594,10 @@ public class Scraper extends Addon {
 	
 	
 	public boolean load() {
-		if (m_fLoaded)
+		if (loaded)
 			return true;
 
-		boolean result = m_parser.load(getLibPath());
+		boolean result = parser.load(getLibPath());
 
 		if (!result)
 			return false;
@@ -679,10 +619,10 @@ public class Scraper extends Addon {
 			Document doc = XMLUtils.getDocument(addon.getLibPath());
 
 			if (addon.getType() == ADDON_TYPE.ADDON_SCRAPER_LIBRARY && doc != null)
-				m_parser.appendDocument(doc);
+				parser.appendDocument(doc);
 		}
 
-		m_fLoaded = true;
+		loaded = true;
 		return true;
 	}
 	
@@ -716,6 +656,122 @@ public class Scraper extends Addon {
 		return getUrlFromXML(outputList);
 	}
 	
+	public ArrayList<ScraperUrl> parseSearchResults(
+			ArrayList<String> searchResults) throws ScraperError {
+
+		boolean fSort = true;
+		boolean fResults = false;
+
+		ArrayList<String> stsDupeCheck = new ArrayList<String>();
+
+		ArrayList<ScraperUrl> result = null;
+		
+		for (String i : searchResults) {
+			Document doc = XMLUtils.getDocumentFromString(i);
+
+			if (doc.getDocumentElement() == null) {
+				continue;  // might have more valid results later
+			}
+
+			checkScraperError(doc.getDocumentElement());
+
+			NodeList resultsList = doc.getElementsByTagName("results");
+
+			if (resultsList.getLength() < 1)
+				continue;
+
+			Element resultEl = (Element) resultsList.item(0);
+
+			fResults = true;  // even if empty
+
+			// we need to sort if returned results don't specify 'sorted="yes"'
+			if (fSort)
+			{
+				String sorted = XMLUtils.getAttribute(resultEl, "sorted");
+				if (sorted != null)
+					fSort = !sorted.equalsIgnoreCase("yes");
+			}
+
+			for (Element entityEl = XMLUtils.getFirstChildElement(resultEl, "entity"); 
+					entityEl != null; 
+					entityEl = XMLUtils.getNextSiblingElement(entityEl, "entity")) {
+
+
+				ScraperUrl scraperUrl = new ScraperUrl();
+
+				// ID
+				Element idEl = XMLUtils.getFirstChildElement(entityEl, "id");
+
+				if (idEl != null && idEl.getFirstChild() != null)
+					scraperUrl.id = idEl.getFirstChild().getNodeValue();
+				
+				// Thumb
+				
+				Element titleEl = XMLUtils.getFirstChildElement(entityEl, "title");
+
+				// Title
+				if (titleEl == null || titleEl.getFirstChild() == null)
+					continue;
+
+				scraperUrl.title = titleEl.getFirstChild().getNodeValue();
+
+				// Link
+				Element urlEl = XMLUtils.getFirstChildElement(entityEl, "url");
+
+				if (urlEl == null || urlEl.getFirstChild() == null) 
+					continue;
+
+
+				for (; urlEl != null && urlEl.getFirstChild() != null; urlEl = XMLUtils
+						.getNextSiblingElement(urlEl, "url"))
+
+					scraperUrl.parseElement(urlEl);
+
+				// Extras
+				Element extraEl = XMLUtils.getFirstChildElement(entityEl);
+				
+				while (extraEl != null) {
+					if (extraEl.getFirstChild() == null) {
+						extraEl = XMLUtils.getNextSiblingElement(extraEl);
+						continue;
+					}
+
+					String nodeName = extraEl.getNodeName();
+					
+					if (nodeName.equals("id") || nodeName.equals("title")
+							|| nodeName.equals("url")) {
+						extraEl = XMLUtils.getNextSiblingElement(extraEl);
+						continue;
+					}
+					
+					String nodeValue = extraEl.getFirstChild().getNodeValue();
+					
+					scraperUrl.extras.put(nodeName, nodeValue);
+					
+					extraEl = XMLUtils.getNextSiblingElement(extraEl);
+				}
+				
+
+				// Check for duplicates
+				if (!stsDupeCheck.contains(scraperUrl.urlList.get(0).url + " " + scraperUrl.title)) {
+					stsDupeCheck.add(scraperUrl.urlList.get(0).url + " " + scraperUrl.title);
+					
+					if (result == null)
+						result = new ArrayList<ScraperUrl>();
+					
+					result.add(scraperUrl);
+				}	
+			}
+
+		}
+		
+		if (!fResults)
+			throw new ScraperError();
+		
+		return result;
+	}
+
+	
 	/**
 	 * This function is exactly same as NfoUrl function. Only difference is the
 	 * RUN call.
@@ -741,16 +797,16 @@ public class Scraper extends Addon {
 		
 		return getUrlFromXML(outputList);
 	}
-
+	
 	
 	/**
 	 * returns a ArrayList of strings: the first is the XML output by the
 	 * function; the rest is XML output by chained functions, possibly
 	 * recursively
 	 * 
-	 * @param function
-	 * @param scrURL
-	 * @param extras
+	 * @param function function to call from the scraper
+	 * @param scrURL contains URLs of any online data to download and put in params
+	 * @param extras offline params
 	 * @return
 	 * @throws ScraperError 
 	 */
@@ -767,9 +823,13 @@ public class Scraper extends Addon {
 			//			if (function.equals("NfoUrl") && function.equals("ResolveIDToUrl"))
 			//				Log.v("Scrapper", "Run: Unable to parse web site");
 
-						throw new ScraperError("Run: Unable to parse web site");
+			throw new ScraperError("Run: Unable to parse web site");
 		}
 
+		// For situations where some & are escaped and some are not
+		// TODO decode it back to & at a later stage
+		strXML = strXML.replaceAll("&(?!amp;)", "&amp;");
+		
 		Document doc = XMLUtils.getDocumentFromString(strXML);
 
 		if(!doc.hasChildNodes())
@@ -799,13 +859,21 @@ public class Scraper extends Addon {
 				// for <chain>, pass the contained text as a parameter; for <url>, as URL content
 				if (xchain.getNodeName().equals("chain"))
 				{
-					Node paramNode = xchain.getFirstChild();
-
-					if (paramNode != null)
-						extras2.add(paramNode.getNodeValue());
+					NodeList contentNodes = xchain.getChildNodes();
+					String content = (contentNodes.getLength() > 0) ? "" : null;
+					
+					for (int i=0; i < contentNodes.getLength(); i++) {
+						content += XMLUtils.nodeToString(contentNodes.item(i));
+					}
+						
+					extras2.add(content);
+					
+//					Node paramNode = xchain.getFirstChild();
+//					if (paramNode != null)
+//						extras2.add(paramNode.getNodeValue());
 				}
 				else
-					scrURL2.ParseElement(xchain);
+					scrURL2.parseElement(xchain);
 
 
 				// Fix for empty chains. $$1 would still contain the
@@ -813,7 +881,7 @@ public class Scraper extends Addon {
 				// since $$1 will always either contain the data from an 
 				// url or the parameters to a chain, we can safely clear it here
 				// to fix this issue
-				m_parser.params[0] = null;
+				parser.params[0] = null;
 				ArrayList<String> result2 = run(szFunction,scrURL2, extras2);
 				
 				if(result2 != null)
@@ -827,6 +895,16 @@ public class Scraper extends Addon {
 	}
 	
 	
+	public ArrayList<String> run(String function, ScraperUrl scrURL,
+			String... params) throws ScraperError {
+		
+		ArrayList<String> paramsList = new ArrayList<String>();
+		
+		for (String param : params)
+			paramsList.add(param);
+		
+		return run(function, scrURL, paramsList);
+	}
 	
 	public ADDON_TYPE scraperTypeFromContent(CONTENT_TYPE content) {
 		switch (content) {
@@ -844,12 +922,12 @@ public class Scraper extends Addon {
 			return ADDON_TYPE.ADDON_UNKNOWN;
 		}
 	}
-	
-	String searchStringEncoding() { 
-		return m_parser.getSearchStringEncoding(); 
-	}
 
 	
+	String searchStringEncoding() { 
+		return parser.getSearchStringEncoding(); 
+	}
+
 	public String translateContent(CONTENT_TYPE type, boolean pretty) {
 		return null;
 	}

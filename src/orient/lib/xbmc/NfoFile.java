@@ -39,7 +39,7 @@ public class NfoFile {
 	public void close() {
 		document = null;
 		headPos = 0;
-		scraperUrl.Clear();
+		scraperUrl.clear();
 	}
 	
 	public NFOResult create(String strPath, Scraper info) {
@@ -169,9 +169,9 @@ public class NfoFile {
 			return NFOResult.ERROR_NFO;
 
 		if (nfo)
-			return scraperUrl.m_url.isEmpty() ? NFOResult.FULL_NFO : NFOResult.COMBINED_NFO;
+			return scraperUrl.urlList.isEmpty() ? NFOResult.FULL_NFO : NFOResult.COMBINED_NFO;
 
-		return scraperUrl.m_url.isEmpty() ? NFOResult.NO_NFO : NFOResult.URL_NFO;
+		return scraperUrl.urlList.isEmpty() ? NFOResult.NO_NFO : NFOResult.URL_NFO;
 	}
 
 	
@@ -198,10 +198,10 @@ public class NfoFile {
 			return 2;
 		}
 
-		if (!scraperUrl.m_url.isEmpty())
+		if (!scraperUrl.urlList.isEmpty())
 			setScraper(scraper);
 
-		return scraperUrl.m_url.isEmpty() ? 1 : 0;
+		return scraperUrl.urlList.isEmpty() ? 1 : 0;
 	}
 	
 	public VideoInfoTag getDetails() {
