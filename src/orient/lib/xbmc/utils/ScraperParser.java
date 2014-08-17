@@ -538,8 +538,12 @@ public class ScraperParser {
 				Pattern pattern2 = Pattern.compile(exp);
 				Matcher matcher2 = pattern2.matcher(result);
 
-				String replacement = matcher.group(groupId).replace("$", "\\$");
+				String replacement = matcher.group(groupId);
 
+				if (replacement == null)
+					replacement = "";
+				
+				replacement = replacement.replace("$", "\\$");
 				//					if (matcher2.find())
 				result = matcher2.replaceAll(replacement);
 			}

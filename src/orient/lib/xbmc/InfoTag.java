@@ -17,18 +17,22 @@ import orient.lib.xbmc.utils.XMLUtils;
 
 public abstract class InfoTag {
 
-	protected String XmlDateFormat = "yyyy-MM-dd";
+	protected String xmlDateFormat = "yyyy-MM-dd";
 	
 	protected Map<String, String> xmlTagMapping = new HashMap<String, String>();
 
 	public InfoTag() {
 		super();
+
+		initXmlTagMapping();
+		reset();
 	}
 	
 	/**
 	 * Called after XML parsing is complete.
+	 * @param element 
 	 */
-	protected void afterParseXML() {
+	protected void afterParseXML(Element element) {
 		
 	}
 
@@ -76,6 +80,14 @@ public abstract class InfoTag {
 		}
 
 		return null;
+	}
+
+	public String getXmlDateFormat() {
+		return xmlDateFormat;
+	}
+
+	public Map<String, String> getXmlTagMapping() {
+		return xmlTagMapping;
 	}
 
 	protected abstract void initXmlTagMapping();
@@ -154,7 +166,11 @@ public abstract class InfoTag {
 
 				String item = XMLUtils.getFirstChildValue(valueEl);
 
+				if (item == null || item.isEmpty())
+					return;
+					
 				arr.add((String) item);
+				
 				getClass().getDeclaredField(fieldName).set(this, arr);
 
 			} catch (NoSuchFieldException | IllegalAccessException
@@ -174,12 +190,15 @@ public abstract class InfoTag {
 	 * @throws ParseException 
 	 */
 	protected Date onParseXMLItemDate(Element el) throws ParseException {
+		String dateFormatAttr = XMLUtils.getAttribute(el, "format");
+		String dateFormat = (dateFormatAttr != null) ? dateFormatAttr : xmlDateFormat;
+		
 		String dateStr = XMLUtils.getFirstChildValue(el);
 
 		Date date = null;
 		
 		if (dateStr != null) {
-			date = new SimpleDateFormat(XmlDateFormat, Locale.ENGLISH).parse(dateStr);
+			date = new SimpleDateFormat(dateFormat, Locale.ENGLISH).parse(dateStr);
 		}
 		
 		return date;
@@ -208,7 +227,7 @@ public abstract class InfoTag {
 	protected int onParseXMLItemInt(Element el) {
 		return XMLUtils.getFirstChildValue_int(el);
 	}
-	
+
 	/**
 	 * Used by the parseXML method. Performs processing on any unrecognized 
 	 * types i.e. Any type other than String, int, float, date, ArrayList
@@ -218,7 +237,7 @@ public abstract class InfoTag {
 	 */
 	protected void onParseXMLItemOther(Element el) {
 	}
-	
+
 	/**
 	 * Used by the parseXML method. Performs any further pre-processing on the
 	 * incoming value if required.
@@ -286,11 +305,11 @@ public abstract class InfoTag {
 		}
 
 		// Post Processing
-		afterParseXML();
+		afterParseXML(element);
 	}
-
+	
 	public abstract void reset();
-
+	
 	/**
 	 * Dynamically set a member of this class.
 	 * 
@@ -345,6 +364,14 @@ public abstract class InfoTag {
 			throws IllegalAccessException, IllegalArgumentException,
 			NoSuchFieldException {
 		getClass().getDeclaredField(fieldName).set(this, value);
+	}
+
+	public void setXmlDateFormat(String xmlDateFormat) {
+		this.xmlDateFormat = xmlDateFormat;
+	}
+
+	public void setXmlTagMapping(Map<String, String> xmlTagMapping) {
+		this.xmlTagMapping = xmlTagMapping;
 	}
 
 }

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings>
+    <setting label="Auto Calculate Programme End Time" type="bool" id="autoendtime" default="true"/>
+</settings>

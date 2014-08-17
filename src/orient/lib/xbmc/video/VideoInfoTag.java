@@ -79,6 +79,11 @@ public class VideoInfoTag extends InfoTag {
 	public int idSeason;
 	/** duration in seconds */
 	public int duration;
+	
+	/** single episode part number */
+	public int episodePart;
+	/** total number of parts of a single episode*/
+	public int episodeTotalParts;
 
 	public float rating;
 	public float epBookmark;
@@ -97,13 +102,11 @@ public class VideoInfoTag extends InfoTag {
 
 	public VideoInfoTag() {
 		super();
-
-		initXmlTagMapping();
-		reset();
 	}
 
-	protected void afterParseXML () {
-		super.afterParseXML();
+	@Override
+	protected void afterParseXML (Element element) {
+		super.afterParseXML(element);
 		
 		// Special Season
 		if (specialAfterSeason > 0) {

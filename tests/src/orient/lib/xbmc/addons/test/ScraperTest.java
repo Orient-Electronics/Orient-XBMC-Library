@@ -4,15 +4,8 @@ import static junitparams.JUnitParamsRunner.$;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -84,7 +77,7 @@ public class ScraperTest {
 		"metadata.epg.indian-television-guide, Star Movies, star-movies",
 		"metadata.epg.tv.burrp.com, Star Movies, 59",
 	})
-	public void findEpg(String scraperId, String channel, String expectedChannelId) throws ScraperError {
+	public void findEpgChannel(String scraperId, String channel, String expectedChannelId) throws ScraperError {
 		Scraper scraper = new Scraper(scraperId);
 		ArrayList<ScraperUrl> movieResults = scraper.findEpgChannel(channel, null);
 		

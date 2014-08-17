@@ -68,6 +68,7 @@ public class Settings {
 		data = new HashMap<String, String>();
 		data.put("musiclibrary.albumsscraper", null);
 		data.put("musiclibrary.artistsscraper", null);
+		data.put("scrapers.epgdefault", "metadata.epg.indian-television-guide");
 		data.put("scrapers.moviesdefault", "metadata.themoviedb.org");
 		data.put("scrapers.musicvideosdefault", null);
 		data.put("scrapers.tvshowsdefault", "metadata.tvdb.com");

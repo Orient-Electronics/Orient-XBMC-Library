@@ -13,15 +13,30 @@ public class ActorInfo {
 	public int order;
 
 	public void parseElement(Element actor) {
+		// Name
 		Element nameEl = XMLUtils.getFirstChildElement(actor, "name");
 		
 		if (nameEl != null)
 			name = XMLUtils.getFirstChildValue(nameEl);
+		else {
+			String nameVal = XMLUtils.getFirstChildValue(actor);
+			
+			if (nameVal != null && !nameVal.trim().isEmpty())
+				name = nameVal.trim();
+		}
 
+		
+		// Role
 		Element roleEl = XMLUtils.getFirstChildElement(actor, "role");
 		
 		if (roleEl != null)
 			role = XMLUtils.getFirstChildValue(roleEl);
+		else {
+			String roleAttr = XMLUtils.getAttribute(actor, "role");
+			
+			if (roleAttr != null && !roleAttr.isEmpty())
+				role = roleAttr;
+		}
 		
 		Element orderEl = XMLUtils.getFirstChildElement(actor, "order");
 		String orderStr = "0";

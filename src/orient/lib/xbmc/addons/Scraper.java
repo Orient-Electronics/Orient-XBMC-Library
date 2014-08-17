@@ -260,24 +260,26 @@ public class Scraper extends Addon {
 		////////////////////////
 		// Relevance Calculation
 		////////////////////////
-		
-		for (ScraperUrl searhResult : searhResults) {
-			
-			// calculate the relevance of this hit
-			String sCompareTitle = StringUtils.lowerCase(searhResult.title);
-			String sMatchTitle = StringUtils.lowerCase(channel);
-			
-			/*
-			 * Identify the best match by performing a fuzzy string compare on the search term and
-			 * the result. Additionally, use the year (if available) to further refine the best match.
-			 * An exact match scores 1, a match off by a year scores 0.5 (release dates can vary between
-			 * countries), otherwise it scores 0.
-			 */
-			searhResult.relevance = CppUtils.fstrcmp(sMatchTitle, sCompareTitle, 0.0);
+
+		if (channel != null && !channel.isEmpty()) {
+			for (ScraperUrl searhResult : searhResults) {
+
+				// calculate the relevance of this hit
+				String sCompareTitle = StringUtils.lowerCase(searhResult.title);
+				String sMatchTitle = StringUtils.lowerCase(channel);
+
+				/*
+				 * Identify the best match by performing a fuzzy string compare on the search term and
+				 * the result. Additionally, use the year (if available) to further refine the best match.
+				 * An exact match scores 1, a match off by a year scores 0.5 (release dates can vary between
+				 * countries), otherwise it scores 0.
+				 */
+				searhResult.relevance = CppUtils.fstrcmp(sMatchTitle, sCompareTitle, 0.0);
+			}
+
+			Collections.sort(searhResults, new RelevanceSortComparator());
 		}
-		
-		Collections.sort(searhResults, new RelevanceSortComparator());
-		
+
 		return searhResults;
 	}
 	

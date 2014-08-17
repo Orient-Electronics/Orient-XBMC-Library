@@ -87,6 +87,9 @@ public class AddonManager {
 		case ADDON_SCRAPER_ARTISTS:
 			setting = settings.get("musiclibrary.artistsscraper");
 			break;
+		case ADDON_SCRAPER_EPG:
+			setting = settings.get("scrapers.epgdefault");
+			break;
 		case ADDON_SCRAPER_MOVIES:
 			setting = settings.get("scrapers.moviesdefault");
 			break;

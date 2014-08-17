@@ -228,6 +228,8 @@ public class Addon {
 		types.add(new TypeMapping("xbmc.metadata.scraper.tvshows",
 				ADDON_TYPE.ADDON_SCRAPER_TVSHOWS, 24014,
 				"DefaultAddonTvInfo.png"));
+		types.add(new TypeMapping("xbmc.metadata.scraper.epg",
+				ADDON_TYPE.ADDON_SCRAPER_EPG, 24099, ""));
 		types.add(new TypeMapping("xbmc.metadata.scraper.library",
 				ADDON_TYPE.ADDON_SCRAPER_LIBRARY, 24083, ""));
 	}
