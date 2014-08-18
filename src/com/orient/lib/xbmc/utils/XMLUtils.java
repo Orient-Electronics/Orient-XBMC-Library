@@ -23,6 +23,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.orient.lib.xbmc.XBMC;
+
 public class XMLUtils {
 
 	/**
@@ -239,25 +241,30 @@ public class XMLUtils {
 	 * @return Document | null
 	 */
 	public static Document getDocument(String path) {
+		return getDocumentFromString(FileUtils.getContents(path));
 
-		File fXmlFile = new File(path);
-
-		if (!fXmlFile.exists())
-			return null;
-
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
-		Document doc = null;
-
-		try {
-			dBuilder = dbFactory.newDocumentBuilder();
-			doc = dBuilder.parse(fXmlFile);
-		} catch (SAXException | IOException | ParserConfigurationException e1) {
-			e1.printStackTrace();
-			return null;
-		}
-
-		return doc;
+//		if (XBMC.getInstance().isAndroid()) {
+//			return getDocumentFromString(FileUtils.getContents(path));
+//		}
+//		
+//		File fXmlFile = new File(path);
+//
+//		if (!fXmlFile.exists())
+//			return null;
+//
+//		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//		DocumentBuilder dBuilder;
+//		Document doc = null;
+//
+//		try {
+//			dBuilder = dbFactory.newDocumentBuilder();
+//			doc = dBuilder.parse(fXmlFile);
+//		} catch (SAXException | IOException | ParserConfigurationException e1) {
+//			e1.printStackTrace();
+//			return null;
+//		}
+//
+//		return doc;
 	}
 
 	/**

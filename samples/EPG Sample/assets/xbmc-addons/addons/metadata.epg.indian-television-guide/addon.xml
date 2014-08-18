@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="metadata.epg.indian-television-guide"
+       name="Indian Television Guide"
+       version="0.0.1"
+       provider-name="Orient">
+  <requires>
+    <import addon="xbmc.metadata" version="2.1.0"/>
+  </requires>
+  <extension point="xbmc.metadata.scraper.epg"
+             language="en"
+             library="lib.xml"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en">http://indian-television-guide.appspot.com/</summary>
+    <platform>all</platform>
+    <website></website>
+    <source></source>
+    <email></email>
+    <forum></forum>
+    <license>GPL v2.0</license>
+  </extension>
+</addon>

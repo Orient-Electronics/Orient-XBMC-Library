@@ -1,9 +1,13 @@
 package com.orient.lib.xbmc;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class Settings {
 	private static Settings instance = null;
@@ -14,10 +18,12 @@ public class Settings {
 		}
 		return instance;
 	}
-	private File cacheDir;
 	
+	private File cacheDir;
 	private File addonDir;
+	
 	private String assetsDirPath;
+	private String addonDirPath;
 	
 	private String testAssetsDirPath;
 	private ArrayList<String> videoCleanStringRegExps;
@@ -36,14 +42,29 @@ public class Settings {
 	private Map<String, String> data;
 	protected Settings() {
 		// Exists only to defeat instantiation.
-
-		// TODO only temp
-		setCacheDir("C:\\Users\\Abdul Rehman\\Dropbox\\Documents\\Programming\\Android\\Workspace\\Orient-XBMC-Library\\assets\\xbmc-addons\\cache");
-		setAddonDir("C:\\Users\\Abdul Rehman\\Dropbox\\Documents\\Programming\\Android\\Workspace\\Orient-XBMC-Library\\assets\\xbmc-addons\\addons");	
 		
-		setAssetsDirPath("C:\\Users\\Abdul Rehman\\Dropbox\\Documents\\Programming\\Android\\Workspace\\Orient-XBMC-Library\\assets\\");	
-		setTestAssetsDirPath("C:\\Users\\Abdul Rehman\\Dropbox\\Documents\\Programming\\Android\\Workspace\\Orient-XBMC-Library\\tests\\assets\\");	
+		// TODO only temp
+		setCacheDir("\\assets\\xbmc-addons\\cache");
+		setAddonDir("\\assets\\xbmc-addons\\addons");	
+
+		setTestAssetsDirPath("tests\\assets\\");	
 	
+		
+		///////////
+		/// Paths
+		String assetsDirStr = FilenameUtils.separatorsToSystem("\\assets");
+		String addonDirStr = FilenameUtils.separatorsToSystem("xbmc-addons\\addons");
+		
+		if (XBMC.getInstance().isAndroid()) {
+			setAssetsDirPath("");
+			setAddonDirPath(addonDirStr);
+		}
+		else {
+			setAssetsDirPath(getAppDir() + assetsDirStr);
+			setAddonDirPath(FilenameUtils.separatorsToSystem(getAssetsDirPath() + "\\" + addonDirStr));
+		}
+		/// End
+		///////
 		
 		videoCleanStringRegExps = new ArrayList<String>();
 		videoCleanStringRegExps.add("[ _\\,\\.\\(\\)\\[\\]\\-](ac3|dts|custom|dc|remastered|divx|divx5|dsr|dsrip|dutch|dvd|dvd5|dvd9|dvdrip|dvdscr|dvdscreener|screener|dvdivx|cam|fragment|fs|hdtv|hdrip|hdtvrip|internal|limited|multisubs|ntsc|ogg|ogm|pal|pdtv|proper|repack|rerip|retail|r3|r5|bd5|se|svcd|swedish|german|read.nfo|nfofix|unrated|extended|ws|telesync|ts|telecine|tc|brrip|bdrip|480p|480i|576p|576i|720p|720i|1080p|1080i|3d|hrhd|hrhdtv|hddvd|bluray|x264|h264|xvid|xvidvd|xxx|www.www|cd[1-9]|\\[.*\\])([ _\\,\\.\\(\\)\\[\\]\\-]|$)");
@@ -81,10 +102,28 @@ public class Settings {
 		return addonDir;
 	}
 	
+	public String getAddonDirPath() {
+		return addonDirPath;
+	}
+	
+	public String getAppDir() {
+		
+		String path = null;
+		
+		try {
+			URI appDir = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().resolve("../..");
+			path = appDir.toString();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		
+		return path;
+	}
+	
+	
 	public String getAssetsDirPath() {
 		return assetsDirPath;
 	}
-	
 	
 	public File getCacheDir() {
 		return cacheDir;
@@ -149,9 +188,14 @@ public class Settings {
 		this.addonDir = new File(addonDir);
 	}
 
+	public void setAddonDirPath(String addonDirPath) {
+		this.addonDirPath = addonDirPath;
+	}
+
 	public void setAssetsDirPath(String assetsDirPath) {
 		this.assetsDirPath = assetsDirPath;
 	}
+
 
 	public void setCacheDir(File cacheDir) {
 		this.cacheDir = cacheDir;
@@ -168,7 +212,6 @@ public class Settings {
 		this.moviesExcludeFromScanRegExps = moviesExcludeFromScanRegExps;
 	}
 
-
 	public void setTestAssetsDirPath(String testAssetsDirPath) {
 		this.testAssetsDirPath = testAssetsDirPath;
 	}
@@ -177,7 +220,7 @@ public class Settings {
 			ArrayList<String> tvshowExcludeFromScanRegExps) {
 		this.tvshowExcludeFromScanRegExps = tvshowExcludeFromScanRegExps;
 	}
-
+	
 	public void setVideoCleanStringRegExps(
 			ArrayList<String> videoCleanStringRegExps) {
 		this.videoCleanStringRegExps = videoCleanStringRegExps;

@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.orient.lib.xbmc.Settings;
+import com.orient.lib.xbmc.utils.FileUtils;
 import com.orient.lib.xbmc.utils.XMLUtils;
 
 public class Addon {
@@ -38,9 +40,8 @@ public class Addon {
 	 */
 	public static boolean exists(String id) {
 		String path = Addon.getAddonXmlPath(id);
-		File file = new File(path);
-
-		if (path == null || !file.exists())
+		
+		if (path == null || !FileUtils.exists(path))
 			return false;
 
 		return true;
@@ -53,13 +54,8 @@ public class Addon {
 	 * @return path | null (if addon directory doesnt exist)
 	 */
 	private static String getAddonXmlPath(String id) {
-		Settings settings = Settings.getInstance();
-		File addonDir = settings.getAddonDir();
-
-		if (addonDir != null && !addonDir.exists())
-			return null;
-
-		return addonDir.getPath() + "\\" + id + "\\addon.xml";
+		return FilenameUtils.separatorsToSystem(Settings.getInstance()
+				.getAddonDirPath() + "\\" + id + "\\addon.xml");
 	}
 
 	@SuppressWarnings("unused")
@@ -258,15 +254,16 @@ public class Addon {
 		AddonProps props = new AddonProps();
 
 		// Addon element
-		Settings settings = Settings.getInstance();
-		File addonDir = settings.getAddonDir();
+//		Settings settings = Settings.getInstance();
+//		File addonDir = settings.getAddonDir();
 
 		Element addonEl = document.getDocumentElement();
 
 		if (addonEl == null || !addonEl.getNodeName().equals("addon"))
 			return false;
 
-		props.path = addonDir.getPath() + "\\" + id;
+		props.path = FilenameUtils.separatorsToSystem(Settings.getInstance()
+				.getAddonDirPath() + "\\" + id);
 
 		props.id = XMLUtils.getAttribute(addonEl, "id");
 		props.name = XMLUtils.getAttribute(addonEl, "name");

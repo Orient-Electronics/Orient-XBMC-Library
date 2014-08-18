@@ -5,6 +5,8 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 import com.orient.lib.xbmc.Settings;
+import com.orient.lib.xbmc.XBMC;
+import com.orient.lib.xbmc.utils.FileUtils;
 
 public class AddonManager {
 
@@ -42,17 +44,19 @@ public class AddonManager {
 	 */
 	public static ArrayList<Scraper> GetScrapers(ADDON_TYPE type) {
 		
-		// Fetching Addon Directory
-		Settings settings = Settings.getInstance();
-		File addonDir = settings.getAddonDir();
+//		// Fetching Addon Directory
+//		Settings settings = Settings.getInstance();
+//		File addonDir = settings.getAddonDir();
+//		
+//		// Getting a list of all folders from the addon directory
+//		String[] directories = addonDir.list(new FilenameFilter() {
+//			  @Override
+//			  public boolean accept(File current, String name) {
+//			    return new File(current, name).isDirectory();
+//			  }
+//			});
 		
-		// Getting a list of all folders from the addon directory
-		String[] directories = addonDir.list(new FilenameFilter() {
-			  @Override
-			  public boolean accept(File current, String name) {
-			    return new File(current, name).isDirectory();
-			  }
-			});
+		String[] directories = FileUtils.listDirectories(XBMC.getInstance().getSettings().getAddonDirPath());
 		
 		if (directories == null)
 			return null;

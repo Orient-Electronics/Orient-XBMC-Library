@@ -2,6 +2,11 @@ package com.orient.lib.xbmc.utils.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.googlecode.zohhak.api.TestWith;
