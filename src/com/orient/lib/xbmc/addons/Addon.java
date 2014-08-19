@@ -132,7 +132,7 @@ public class Addon {
 	}
 
 	public String getLibPath() {
-		return props.path + "\\" + props.libname;
+		return FilenameUtils.separatorsToSystem(props.path + "/" + props.libname);
 	}
 
 	public String getMinVersion() {
@@ -320,7 +320,7 @@ public class Addon {
 		// if (!hasSettings)
 		// return false;
 
-		String addonFileName = props.path + "/resources/settings.xml";
+		String addonFileName = FilenameUtils.separatorsToSystem(props.path + "/resources/settings.xml");
 
 		if (addonXmlDoc == null)
 			addonXmlDoc = XMLUtils.getDocument(addonFileName);
@@ -352,8 +352,9 @@ public class Addon {
 		String chosenPath = props.path + "/resources/language/"
 				+ Locale.getDefault().getDisplayLanguage();
 
-		Document stringsXmlDoc = XMLUtils.getDocument(chosenPath
-				+ "/strings.xml");
+		chosenPath = FilenameUtils.separatorsToSystem(chosenPath + "/strings.xml");
+		
+		Document stringsXmlDoc = XMLUtils.getDocument(chosenPath);
 
 		if (stringsXmlDoc == null) {
 			hasStrings = false;

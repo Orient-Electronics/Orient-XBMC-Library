@@ -12,6 +12,7 @@ import com.orient.lib.xbmc.addons.ADDON_TYPE;
 import com.orient.lib.xbmc.addons.AddonManager;
 import com.orient.lib.xbmc.addons.Scraper;
 import com.orient.lib.xbmc.addons.ScraperError;
+import com.orient.lib.xbmc.utils.FileUtils;
 import com.orient.lib.xbmc.utils.ScraperUrl;
 import com.orient.lib.xbmc.utils.XMLUtils;
 import com.orient.lib.xbmc.video.VideoInfoTag;
@@ -266,24 +267,35 @@ public class NfoFile {
 	 * @return
 	 */
 	public boolean load(String fileName) {
-		BufferedReader br;
-		try {
-			br = new BufferedReader(new FileReader(fileName));
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
-
-			while (line != null) {
-				sb.append(line);
-				sb.append("\n");
-				line = br.readLine();
-			}
-			document = sb.toString();
-			br.close();
-			return true;
-		} catch (IOException e) {
+		
+		String contents = FileUtils.getContents(fileName);
+		
+		if (contents == null) {
 			document = null;
 			return false;
 		}
+		
+		document = contents;
+		return true;
+		
+//		BufferedReader br;
+//		try {
+//			br = new BufferedReader(new FileReader(fileName));
+//			StringBuilder sb = new StringBuilder();
+//			String line = br.readLine();
+//
+//			while (line != null) {
+//				sb.append(line);
+//				sb.append("\n");
+//				line = br.readLine();
+//			}
+//			document = sb.toString();
+//			br.close();
+//			return true;
+//		} catch (IOException e) {
+//			document = null;
+//			return false;
+//		}
 	}
 
 	/**

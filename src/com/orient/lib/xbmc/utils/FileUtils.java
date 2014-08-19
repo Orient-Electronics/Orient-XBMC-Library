@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import android.content.res.AssetManager;
@@ -118,6 +120,7 @@ public class FileUtils {
 	
 	public static String getContents(String path) {
 		
+		path = FilenameUtils.separatorsToSystem(path);
 		String content = null;
 		
 		if (XBMC.getInstance().isAndroid()) {
@@ -134,11 +137,15 @@ public class FileUtils {
 		}
 		else {
 			try {
-				content = org.apache.commons.io.FileUtils.readFileToString(new File(path));
+//				content = new Scanner(new File(path)).useDelimiter("\\Z").next();
+
+				content = org.apache.commons.io.FileUtils.readFileToString(new File(path), "UTF-8");
 			} catch (IOException e) {
 				return null;
 			}
 		}
+		
+		content = content.replaceAll("[^\\x20-\\x7e]", "");
 		
 		return content;
 	}

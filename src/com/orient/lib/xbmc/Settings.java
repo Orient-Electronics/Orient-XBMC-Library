@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 public class Settings {
 	private static Settings instance = null;
@@ -52,7 +54,7 @@ public class Settings {
 		
 		///////////
 		/// Paths
-		String assetsDirStr = FilenameUtils.separatorsToSystem("\\assets");
+		String assetsDirStr = FilenameUtils.separatorsToSystem("assets");
 		String addonDirStr = FilenameUtils.separatorsToSystem("xbmc-addons\\addons");
 		
 		if (XBMC.getInstance().isAndroid()) {
@@ -113,6 +115,13 @@ public class Settings {
 		try {
 			URI appDir = getClass().getProtectionDomain().getCodeSource().getLocation().toURI().resolve("../..");
 			path = appDir.toString();
+			
+			// Required on Windows, untested on others
+			if (SystemUtils.IS_OS_WINDOWS) {
+				path = StringUtils.removeStart(path, "file:/");
+				path = path.replace("%20", " ");
+			}
+				
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

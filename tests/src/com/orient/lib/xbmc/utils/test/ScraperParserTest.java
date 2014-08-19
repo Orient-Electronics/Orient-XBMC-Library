@@ -31,7 +31,7 @@ public class ScraperParserTest {
 
 	@Before
 	public void setUp() throws Exception {		
-		String filePath = assetsPath + "xbmc-addons\\addons\\metadata.themoviedb.org\\tmdb.xml";
+		String filePath = assetsPath + "\\xbmc-addons\\addons\\metadata.themoviedb.org\\tmdb.xml";
 		loadResult = parser.load(filePath);
 	}
 	

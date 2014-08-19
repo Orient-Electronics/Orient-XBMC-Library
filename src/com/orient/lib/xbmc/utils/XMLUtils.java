@@ -16,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -246,7 +247,7 @@ public class XMLUtils {
 //		if (XBMC.getInstance().isAndroid()) {
 //			return getDocumentFromString(FileUtils.getContents(path));
 //		}
-//		
+//
 //		File fXmlFile = new File(path);
 //
 //		if (!fXmlFile.exists())
@@ -274,15 +275,17 @@ public class XMLUtils {
 	 * @return Document | null
 	 */
 	public static Document getDocumentFromString(String xmlStr) {
+		
+		
+		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
 		try {
 			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(new StringReader(
-					xmlStr)));
+			Document doc = builder.parse(new InputSource(new StringReader(xmlStr)));
 			return doc;
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			return null;
 		}
 	}

@@ -111,7 +111,7 @@ public class Scraper extends Addon {
 		// request a search URL from the title/filename/etc.
 		ArrayList<String> searchResults = run("CreateSearchUrl", null, params);
 
-		if (searchResults.isEmpty())
+		if (searchResults == null || searchResults.isEmpty())
 		{
 			//		    CLog::Log(LOGDEBUG, "%s: CreateSearchUrl failed", __FUNCTION__);
 			throw new ScraperError();
