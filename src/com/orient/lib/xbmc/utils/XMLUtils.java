@@ -1,5 +1,6 @@
 package com.orient.lib.xbmc.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -158,7 +159,7 @@ public class XMLUtils {
 		Node sibling = node.getNextSibling();
 		while (sibling != null) {
 			if ((sibling.getNodeType() == Node.ELEMENT_NODE)
-					&& (sibling.getNodeName() == tag)) {
+					&& (sibling.getNodeName().equals(tag))) {
 				return (Element) sibling;
 			}
 			sibling = sibling.getNextSibling();
@@ -242,30 +243,29 @@ public class XMLUtils {
 	 * @return Document | null
 	 */
 	public static Document getDocument(String path) {
-		return getDocumentFromString(FileUtils.getContents(path));
 
-//		if (XBMC.getInstance().isAndroid()) {
-//			return getDocumentFromString(FileUtils.getContents(path));
-//		}
-//
-//		File fXmlFile = new File(path);
-//
-//		if (!fXmlFile.exists())
-//			return null;
-//
-//		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-//		DocumentBuilder dBuilder;
-//		Document doc = null;
-//
-//		try {
-//			dBuilder = dbFactory.newDocumentBuilder();
-//			doc = dBuilder.parse(fXmlFile);
-//		} catch (SAXException | IOException | ParserConfigurationException e1) {
-//			e1.printStackTrace();
-//			return null;
-//		}
-//
-//		return doc;
+		if (XBMC.getInstance().isAndroid()) {
+			return getDocumentFromString(FileUtils.getContents(path));
+		}
+
+		File fXmlFile = new File(path);
+
+		if (!fXmlFile.exists())
+			return null;
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		Document doc = null;
+
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			doc = dBuilder.parse(fXmlFile);
+		} catch (SAXException | IOException | ParserConfigurationException e1) {
+			e1.printStackTrace();
+			return null;
+		}
+
+		return doc;
 	}
 
 	/**
@@ -282,10 +282,17 @@ public class XMLUtils {
 		DocumentBuilder builder;
 		try {
 			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(new StringReader(xmlStr)));
+			
+			Document doc;
+			
+			if (XBMC.getInstance().isAndroid()) 
+				doc =  builder.parse(new ByteArrayInputStream(xmlStr.getBytes()));
+			else
+				doc = builder.parse(new InputSource(new StringReader(xmlStr)));
+			
 			return doc;
 		} catch (Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 			return null;
 		}
 	}

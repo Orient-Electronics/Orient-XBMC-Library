@@ -61,16 +61,37 @@ public class Epg {
 	}	
 	
 	
-	public ArrayList<ScraperUrl> findChannel(String channel) throws ScraperError {
+	public ArrayList<ChannelInfoTag> findChannel(String channel) throws ScraperError {
 		return findChannel(channel);
 	}
 
-	public ArrayList<ScraperUrl> findChannel(Scraper scraper, String channel) throws ScraperError {
+	public ArrayList<ChannelInfoTag> findChannel(Scraper scraper, String channel) throws ScraperError {
 		
 		if (scraper == null)
 			scraper = AddonManager.getDefaultScraper(ADDON_TYPE.ADDON_SCRAPER_EPG);
 		
-		return scraper.findEpgChannel(channel, null);
+		ArrayList<ScraperUrl> urls = scraper.findEpgChannel(channel, null);
+		
+		if (urls == null)
+			return null;
+		
+		for (ScraperUrl url : urls) {
+			
+			if (channelList == null)
+				channelList = new ArrayList<ChannelInfoTag>();
+			
+			ChannelInfoTag tag = new ChannelInfoTag();
+			tag.id = url.id;
+			tag.name = url.title;
+			tag.url = url;
+			
+			if (url.urlList != null && !url.urlList.isEmpty())
+				tag.logoUrl = url.urlList.get(0).thumb;
+			
+			channelList.add(tag);
+		}
+		
+		return channelList;
 	}
 	
 	public void clear() {

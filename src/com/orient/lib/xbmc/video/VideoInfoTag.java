@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.w3c.dom.Element;
 
+import com.orient.lib.xbmc.CONTENT_TYPE;
 import com.orient.lib.xbmc.InfoTag;
 import com.orient.lib.xbmc.utils.ScraperUrl;
 import com.orient.lib.xbmc.utils.StreamDetail;
@@ -99,6 +100,7 @@ public class VideoInfoTag extends InfoTag {
 	public Bookmark resumePoint;
 
 	// MediaType type;
+	public CONTENT_TYPE type;
 
 	public VideoInfoTag() {
 		super();
@@ -173,7 +175,7 @@ public class VideoInfoTag extends InfoTag {
 		xmlTagMapping.put("actor", "cast");
 
 		// Other
-		xmlTagMapping.put("thumb", "pictureUrl");
+		xmlTagMapping.put("thumb", "logoUrl");
 		xmlTagMapping.put("fanart", "fanartUrl");
 		xmlTagMapping.put("fileinfo", "streamDetails");
 		xmlTagMapping.put("resume", "resumePoint");
@@ -268,20 +270,20 @@ public class VideoInfoTag extends InfoTag {
 		String tag = el.getNodeName();
 
 		// Thumbs
-		if (tag == "thumb") {
+		if (tag.equals("thumb")) {
 
 			if (pictureUrl == null)
 				pictureUrl = new ScraperUrl();
 
 			pictureUrl.parseElement(el);
 		}
-		if (tag == "fanart") {
+		if (tag.equals("fanart")) {
 
 			if (fanartUrl == null)
 				fanartUrl = new ScraperUrl();
 
 			fanartUrl.parseElement(el);
-		} else if (tag == "fileinfo") {
+		} else if (tag.equals("fileinfo")) {
 			Element streamEl = XMLUtils.getFirstChildElement(el,
 					"streamdetails");
 
@@ -319,7 +321,7 @@ public class VideoInfoTag extends InfoTag {
 
 				typeEl = XMLUtils.getNextSiblingElement(typeEl);
 			}
-		} else if (tag == "resume") {
+		} else if (tag.equals("resume")) {
 			Element position = XMLUtils.getFirstChildElement(el, "position");
 
 			if (position != null) {

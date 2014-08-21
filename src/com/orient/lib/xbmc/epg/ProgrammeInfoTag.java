@@ -26,7 +26,12 @@ public class ProgrammeInfoTag extends InfoTag {
 
 	public String channelId;
 	
+	/**
+	 * @deprecated use info.type instead
+	 */
 	public CONTENT_TYPE type;
+	
+	public boolean hasDetails;
 	
 	// PVR::CPVRTimerInfoTagPtr m_timer;
 	// CEpg * m_epg; /*!< the schedule that this event belongs to */
@@ -43,6 +48,7 @@ public class ProgrammeInfoTag extends InfoTag {
 		type = CONTENT_TYPE.CONTENT_NONE;
 		
 		info = new VideoInfoTag();
+		info.type = CONTENT_TYPE.CONTENT_NONE;
 	
 		initXmlTagMapping();
 	}
@@ -71,7 +77,7 @@ public class ProgrammeInfoTag extends InfoTag {
 		
 		videoInfoMapping.put("desc", "plot");
 		videoInfoMapping.put("category", "genre");
-//		videoInfoMapping.put("icon", "pictureUrl");
+//		videoInfoMapping.put("icon", "logoUrl");
 		videoInfoMapping.put("release", "premiered");
 		videoInfoMapping.put("category", "genre");
 		
@@ -94,25 +100,25 @@ public class ProgrammeInfoTag extends InfoTag {
 		String tag = el.getNodeName();
 
 		// Type
-		if (tag == "type") {
+		if (tag.equals("type")) {
 			String value = XMLUtils.getFirstChildValue(el);
 			value = StringUtils.replace(value, " ", "");
 			
 			if (value.equalsIgnoreCase("tvshow") || value.equalsIgnoreCase("tvshows")
 					 || value.equalsIgnoreCase("tvseries")) {
-				this.type = CONTENT_TYPE.CONTENT_TVSHOWS;
+				this.info.type = CONTENT_TYPE.CONTENT_TVSHOWS;
 			}
 			else if (value.equalsIgnoreCase("movie") || value.equalsIgnoreCase("movies")) {
-				this.type = CONTENT_TYPE.CONTENT_MOVIES;
+				this.info.type = CONTENT_TYPE.CONTENT_MOVIES;
 			}
 			else if (value.equalsIgnoreCase("musicvideo") || value.equalsIgnoreCase("musicvideos")) {
-				this.type = CONTENT_TYPE.CONTENT_MUSICVIDEOS;
+				this.info.type = CONTENT_TYPE.CONTENT_MUSICVIDEOS;
 			}
 			else
-				this.type = CONTENT_TYPE.CONTENT_NONE;
+				this.info.type = CONTENT_TYPE.CONTENT_NONE;
 		}
 		// Icon
-		else if (tag == "icon") {
+		else if (tag.equals("icon")) {
 
 			String url = XMLUtils.getAttribute(el, "src");
 

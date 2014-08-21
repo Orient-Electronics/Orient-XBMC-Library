@@ -298,7 +298,7 @@ public class ScraperParser {
 		rootElement = document.getDocumentElement();
 		String strValue = rootElement.getTagName();
 
-		if (strValue == "scraper") {
+		if (strValue.equals("scraper")) {
 			NodeList children = rootElement.getChildNodes();
 
 			for (int i = 0; i < children.getLength(); i++) {

@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 
 import com.orient.lib.xbmc.addons.Scraper;
 import com.orient.lib.xbmc.addons.ScraperError;
+import com.orient.lib.xbmc.epg.ChannelInfoTag;
 import com.orient.lib.xbmc.epg.Epg;
 import com.orient.lib.xbmc.utils.ScraperUrl;
 
@@ -36,7 +37,7 @@ public class EpgTest {
 		Scraper scraper = new Scraper(scraperId);
 		
 		Epg epg = new Epg();
-		ArrayList<ScraperUrl> results = epg.findChannel(scraper, channel);
+		ArrayList<ChannelInfoTag> results = epg.findChannel(scraper, channel);
 		
 		assertEquals(expectedChannelId, results.get(0).id);
 	}

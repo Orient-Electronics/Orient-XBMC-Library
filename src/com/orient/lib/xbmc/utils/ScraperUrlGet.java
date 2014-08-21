@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;

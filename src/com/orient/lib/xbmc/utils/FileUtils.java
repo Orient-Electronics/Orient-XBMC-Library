@@ -129,7 +129,7 @@ public class FileUtils {
 				InputStream contentIn = am.open(path);
 				
 				StringWriter writer = new StringWriter();
-				IOUtils.copy(contentIn, writer);
+				IOUtils.copy(contentIn, writer, "UTF-8");
 				content = writer.toString();
 			} catch (IOException e) {
 				return null;
@@ -140,12 +140,12 @@ public class FileUtils {
 //				content = new Scanner(new File(path)).useDelimiter("\\Z").next();
 
 				content = org.apache.commons.io.FileUtils.readFileToString(new File(path), "UTF-8");
+				content = content.replaceAll("[^\\x20-\\x7e]", "");
 			} catch (IOException e) {
 				return null;
 			}
 		}
 		
-		content = content.replaceAll("[^\\x20-\\x7e]", "");
 		
 		return content;
 	}

@@ -10,7 +10,8 @@ public class ChannelInfoTag extends InfoTag {
 
 	public String id;
 	public String name;
-	public ScraperUrl pictureUrl;
+	public String logoUrl;
+	public ScraperUrl url;
 	
 	@Override
 	protected void initXmlTagMapping() {
@@ -42,15 +43,8 @@ public class ChannelInfoTag extends InfoTag {
 		// Icon
 		if (tag == "icon") {
 
-			String url = XMLUtils.getAttribute(el, "src");
+			logoUrl = XMLUtils.getAttribute(el, "src");
 
-			if (url != null && !url.isEmpty()) {
-
-				if (pictureUrl == null)
-					pictureUrl = new ScraperUrl();
-
-				pictureUrl.parseString("<url>" + url + "</url>");
-			}
 		}
 	}	
 }
