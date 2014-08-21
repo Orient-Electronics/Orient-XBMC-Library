@@ -3,19 +3,23 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.orient.app.epgsample.ScraperListActivity"
-    tools:ignore="MergeRootFrame" >
+    tools:context="com.orient.app.epgsample.ProgrammeGuideActivity"
+    tools:ignore="MergeRootFrame">
 
-    <include layout="@layout/state_loading"
-        android:id="@+id/loadingState"
+	<include layout="@layout/state_loading"
+        android:id="@+id/programeGuideLoadingState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    
+    <include layout="@layout/state_error_network"
+        android:id="@+id/programeGuideNetworkErrorState"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     
     <ListView
-        android:id="@+id/scraperList"
+        android:id="@+id/programmeList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>
 
 </FrameLayout>
-

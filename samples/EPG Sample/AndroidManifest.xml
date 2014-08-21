@@ -5,7 +5,8 @@
     android:versionName="1.0" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="19" />
@@ -27,6 +28,10 @@
         <activity
             android:name="com.orient.app.epgsample.ChannelListActivity"
             android:label="@string/title_activity_channel_list" >
+        </activity>
+        <activity
+            android:name="com.orient.app.epgsample.ProgrammeGuideActivity"
+            android:label="@string/title_activity_programme_guide" >
         </activity>
     </application>
 

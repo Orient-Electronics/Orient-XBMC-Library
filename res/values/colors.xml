@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+	<color name="white">#FFFFFFFF</color>
+	<color name="text_blue">#FF639BD4</color>
+	<color name="text_grey">#FF939598</color>
+	<color name="text_green">#FF3bb35a</color>
+	
+	<color name="orient_blue">#FF094fa3</color>
+	
+	<color name="info_bar_background">#FF333333</color>
+	<color name="info_bar_text">#FFFFFFFF</color>
+	
+</resources>
